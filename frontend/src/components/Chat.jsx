@@ -5,7 +5,7 @@ import { io } from 'socket.io-client';
 import { BASE_URL } from '../utils/constants';
 import axios from 'axios';
 import RenderFiles from './RenderFiles';
-const socket = io('http://localhost:7000');
+const socket = io('http://localhost:7777');
 const Chat = () => {
   const [file, setFile] = useState(null);
   const [messageText, setMessageText] = useState('');

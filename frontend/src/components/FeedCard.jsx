@@ -11,7 +11,7 @@ const FeedCard = ({ feedUser }) => {
   const navigate = useNavigate();
   const loggedInUser = useSelector((store) => store.user);
   const fromUserId = loggedInUser?._id;
-
+   
   const { firstName, lastName, photoUrl, about, _id } = feedUser;
 
   const viewProfile = (feedUser) => {
@@ -58,19 +58,22 @@ const FeedCard = ({ feedUser }) => {
         </p>
       </div>
       <div className="absolute bottom-4 w-full px-3 flex justify-between gap-3">
-        <button
-          onClick={() => requestSend('ignored')}
-          className="bg-purple-600 text-soft-white hover:bg-purple-700 px-2 py-2 rounded-full w-full"
-        >
-          Ignore
-        </button>
-        <button
-          onClick={() => requestSend('interested')}
-          className="bg-cyan-500 text-soft-white hover:bg-cyan-600 px-2 py-2 rounded-full w-full"
-        >
-          Interested
-        </button>
-      </div>
+  <button
+    onClick={() => requestSend('ignored')}
+    className="bg-[#333333] text-soft-white hover:bg-[#444444] px-2 py-2 rounded-full w-full"
+  >
+    Ignore
+  </button>
+  <button
+    onClick={() => requestSend('interested')}
+    className="bg-[#3E8EFF] text-soft-white hover:bg-[#2A6FD8] px-2 py-2 rounded-full w-full"
+  >
+    Interested
+  </button>
+</div>
+
+
+
     </div>
   );
 };

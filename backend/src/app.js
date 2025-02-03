@@ -10,7 +10,7 @@ const socketManager =   require('./sockets/index');
 require("dotenv").config()
 const io = socketIo(server, {
   cors: {
-    origin: "http://localhost:5173", 
+    origin: "http://localhost:5175", 
     methods: ["GET", "POST"], 
     allowedHeaders: ["Content-Type"], 
   },
@@ -18,7 +18,7 @@ const io = socketIo(server, {
 socketManager(io);
 app.use(express.json());
 app.use(cors({
-  origin:"http://localhost:5173",
+  origin:"http://localhost:5175",
   credentials:true,
 }));
 app.use(cookieParser());

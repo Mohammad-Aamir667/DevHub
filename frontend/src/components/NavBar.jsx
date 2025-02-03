@@ -36,7 +36,7 @@ const NavBar = () => {
     <div className="fixed z-30 navbar bg-vibrantClay text-white">
       <div className="flex-1">
         <Link to="/" className="btn btn-ghost text-xl text-gray-700">
-          Dev Tinder
+          DevHub
         </Link>
       </div>
       <div className="flex-none gap-4">
