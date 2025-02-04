@@ -4,57 +4,29 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars, faTimes, faList, faClock, faCheckCircle, faStar, faComment } from "@fortawesome/free-solid-svg-icons";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import axios from "axios";
-import { BASE_URL } from "../utils/constants";
-import { removeAcceptedRequest, removePendingRequest, setAcceptedRequests, setDeclinedRequests, setExpertInteractions, setPendingRequests, setResolvedRequests } from "../utils/expertInteractionslice";
 import AcceptedRequests from "./AcceptedRequests";
 import ExpertManageRequests from "./ExpertManageRequests";
+import { handleCardClick, handleRequest, handleResolved } from "../utils/store";
 
 const ExpertDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const convoType = "expert-user";
   const totalRequests = useSelector((store) => store.expertInteractions);
   const pendingRequests = totalRequests?.pendingRequests;
   const acceptedRequests = totalRequests?.acceptedRequests;
   const resolvedRequests = totalRequests?.resolvedRequests;
-  console.log(acceptedRequests);
   const navigate = useNavigate();
-  console.log(pendingRequests);
   const dispatch = useDispatch();
-  const handleRequest = async (status, requestId) => {
-    try {
-      const res = await axios.post(BASE_URL + "/request-review/" + status + "/" + requestId, {}, { withCredentials: true })
-      dispatch(removePendingRequest(requestId));
-      if (status === "accepted") {
-        dispatch(setExpertInteractions(res.data));
-        dispatch(setAcceptedRequests(res.data));
-      }
-      if (status === "declined") {
-        dispatch(setExpertInteractions(res.data));
-        dispatch(setDeclinedRequests(res.data));
-      }
-    }
-    catch (err) {
-      console.log(err);
-    }
-  }
-  const handleResolved = async (requestId) => {
-    try {
-      const res = await axios.post(BASE_URL + "/request-resolved/" + requestId, {}, { withCredentials: true })
-      dispatch(setResolvedRequests(res.data));
-      dispatch(setExpertInteractions(res.data));
-      dispatch(removeAcceptedRequest(requestId));
-      console.log(res.data)
-    }
-    catch (err) {
-      console.log(err);
-    }
-  }
-  const handleCardClick = (userProfile) => {
+  const onRequestHandle = (status, requestId) => {
+    dispatch(handleRequest(status, requestId));
+};
+   const onRequestResolved = (requestId) => {
+       dispatch(handleResolved( requestId));
+   };
 
-navigate("/chat-box",{state:{chatUser:userProfile}});
-
+  const onCardClick = (userProfile) => {
+      handleCardClick(userProfile, navigate);
   };
+  
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
@@ -62,7 +34,6 @@ navigate("/chat-box",{state:{chatUser:userProfile}});
 
   return (
     <div className="min-h-screen flex bg-gray-100">
-      {/* Sidebar */}
       <div
         className={`fixed z-20 inset-y-0 left-0 transform ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
           } transition-transform duration-300 ease-in-out bg-white w-64 shadow-md h-screen p-6 md:relative md:translate-x-0`}
@@ -95,16 +66,12 @@ navigate("/chat-box",{state:{chatUser:userProfile}});
                   to={{
                     pathname: "/view-requests",
                     search: "?role=expert",
-                    state: { handleRequest, handleCardClick }
+                  
                   }}
                 >
                   View Requests (Expert)
                 </Link>
-
-
-
               </li>
-
             </li>
           </li>
           <li>
@@ -187,7 +154,7 @@ navigate("/chat-box",{state:{chatUser:userProfile}});
           {/* Recent Requests */}
           <div className="bg-white p-6 shadow rounded-lg">
             <h3 className="text-lg font-bold text-gray-700 mb-4">Recent Requests</h3>
-            <ExpertManageRequests pendingRequests={pendingRequests} handleRequest={handleRequest} />
+            <ExpertManageRequests pendingRequests={pendingRequests} handleRequest={onRequestHandle} />
           </div>
           {/* Schedule Section */}
           <div className="bg-white p-6 shadow rounded-lg">
@@ -197,7 +164,7 @@ navigate("/chat-box",{state:{chatUser:userProfile}});
         </div>
         <div className="bg-white p-6 shadow rounded-lg">
           <h3 className="text-lg font-bold text-gray-700 mb-4">Help Users</h3>
-          <AcceptedRequests acceptedRequests={acceptedRequests} handleResolved={handleResolved} handleCardClick={handleCardClick} />
+          <AcceptedRequests acceptedRequests={acceptedRequests} handleResolved={onRequestResolved} handleCardClick={onCardClick} />
         </div>
       </div>
     </div>

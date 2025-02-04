@@ -1,19 +1,20 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
 import { removeUser } from "../utils/userSlice";
 import axios from "axios";
-import { removerExpertInteractions } from "../utils/expertInteractionslice";
+import { removerExpertInteractions, setAcceptedRequests, setExpertInteractions, setPendingRequests, setResolvedRequests } from "../utils/expertInteractionslice";
 import { clearFeed } from "../utils/feedSlice";
-import { clearExpertData } from "../utils/expertDetailsSlice";
+import { clearExpertData, updateExpertStatus } from "../utils/expertDetailsSlice";
+import { setInteractions } from "../utils/interactionSlice";
 
 const NavBar = () => {
   const user = useSelector((store) => store.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const expertDetails = useSelector((store) => store.expertDetails);
-
+   console.log(expertDetails?.expertId)
   // Example notification count (replace with actual state if using Redux or backend integration)
   const notifications = useSelector((store) => store.notifications || []); // Assuming you have a notifications slice
   const unreadCount = notifications.filter((n) => !n.read).length;
@@ -31,7 +32,8 @@ const NavBar = () => {
       alert("Something went wrong");
     }
   };
-
+ 
+ 
   return (
     <div className="fixed z-30 navbar bg-vibrantClay text-white">
       <div className="flex-1">

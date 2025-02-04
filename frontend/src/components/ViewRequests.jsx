@@ -1,40 +1,45 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
-import HelpRequests from "./ExpertManageRequests";
 import AcceptedRequests from "./AcceptedRequests";
+import ExpertManageRequests from "./ExpertManageRequests";
+import { handleCardClick, handleRequest, handleResolved } from "../utils/store";
 
 const ViewRequests = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch()
   const location = useLocation();
-  const {handleRequest,handleCardClick }= location?.state||{};
-   console.log(location.state)
   const params = new URLSearchParams(location.search);
   const role = params.get("role") || "user"; 
-
   const [selectedCategory, setSelectedCategory] = useState("pending");
-
   const expertInteractions = useSelector((store) => store.expertInteractions);
   const userInteractions = useSelector((store) => store.userInteractions);
-
-  
   const interactions =
     role === "expert"
       ? expertInteractions?.[`${selectedCategory}Requests`] || []
       : userInteractions?.filter(
           (request) => request.status === selectedCategory
         ) || [];
-
+      const onCardClick = (userProfile) => {
+          handleCardClick(userProfile, navigate);
+      };    
+    const onRequestHandle = (status, requestId) => {
+      dispatch(handleRequest(status, requestId));
+  };
+ const onRequestResolved = (requestId) => {
+        dispatch(handleResolved(requestId));
+    };
   const handleChat = (request) => {
     const expert = request.expertId.firstName;
-    const user = request.userId.firstName;
-    console.log(expert, user);
     if (request.status === "accepted") {
       if (expert) {
         navigate("/chat-box", { state: { chatUser: request.expertId } });
       } else {
         navigate("/chat-box", { state: { chatUser: request.userId } });
       }
+    }
+    else{
+      return;
     }
   };
 
@@ -63,16 +68,15 @@ const ViewRequests = () => {
 
       {/* For Expert role, show HelpRequests when selectedCategory is "pending" */}
       {role === "expert" && selectedCategory === "pending" && (
-        <HelpRequests
+        <ExpertManageRequests
           pendingRequests={interactions}
-          handleRequest={handleRequest} // Handle Accept/Decline actions
-         // handleResolve={(id) => console.log("Resolved:", id)} // Handle Resolve action
+          handleRequest={onRequestHandle} 
         />
       )}
          {/* For Expert role, show HelpRequests when selectedCategory is "pending" */}
          {role === "expert" && selectedCategory === "accepted" && (
         <AcceptedRequests
-        acceptedRequests={interactions} handleCardClick={handleCardClick}
+        acceptedRequests={interactions}  handleResolved={onRequestResolved} handleCardClick={onCardClick}
            // Handle Accept/Decline actions
          // handleResolve={(id) => console.log("Resolved:", id)} // Handle Resolve action
         />

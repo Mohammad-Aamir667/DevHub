@@ -6,13 +6,16 @@ import {BASE_URL} from '../utils/constants'
 import { useDispatch, useSelector } from 'react-redux'
 import { addUser } from '../utils/userSlice'
 import BottomNavigation from './BottomNav'
+import { updateExpertStatus } from '../utils/expertDetailsSlice';
+import { setInteractions } from '../utils/interactionSlice';
+import { setAcceptedRequests, setExpertInteractions, setPendingRequests, setResolvedRequests } from '../utils/expertInteractionslice';
 
 const Body = () =>{
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((store)=>store.user);
   const fetchUser = async ()=>{
-        if(user) return;
+     if(user) return;
     try{   
       const res = await axios.get(BASE_URL+"/profile",{
        withCredentials:true,
@@ -28,8 +31,11 @@ const Body = () =>{
 else alert(err.response.data)
        }
   }
+  
+
 useEffect(()=>{
   fetchUser(); 
+ 
 },[])
  
   return (

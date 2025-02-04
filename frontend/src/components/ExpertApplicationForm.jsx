@@ -81,6 +81,9 @@ const ExpertApplicationForm = () => {
     });
     handleExpertFormSubmit(formDataToSubmit);
   };
+  const handleReapply = () =>{
+     dispatch(updateExpertStatus({status:"pending"}))
+  }
   
   if (expertDetails.expertId) {
     if (expertDetails.status === "pending"){
@@ -97,7 +100,7 @@ const ExpertApplicationForm = () => {
           <p>We’re sorry to inform you that your application has been rejected.</p>
           <p>You may review your details and apply again if necessary.</p>
           <button
-            onClick={() => navigate("/apply-again")}
+            onClick={() => handleReapply()}
             className="mt-4 bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600"
           >
             Apply Again
