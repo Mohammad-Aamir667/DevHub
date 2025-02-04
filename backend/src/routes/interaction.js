@@ -145,7 +145,7 @@ const existingHelpAccepted
     }).populate("userId",USER_SAFE_DATA);                            
     if(!existingHelpAccepted) {
         return res.status(400).json({
-          message:"connection request not found"
+          message:"Help request not found"
         })
     }   
    
