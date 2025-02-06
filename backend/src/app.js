@@ -32,6 +32,7 @@ const fileRouter = require("./routes/files");
 const expertRouter = require("./routes/expert");
 const adminRouter = require("./routes/admin");
 const interactionRouter = require("./routes/interaction");
+const PORT = process.env.PORT || 10000
 app.use("/",authRouter);
 app.use("/",profileRouter);
 app.use("/",requestRouter);
@@ -43,7 +44,7 @@ app.use("/",adminRouter);
 app.use("/",interactionRouter);
 connectDB().then(()=>{
     console.log("connected successfully")
-    server.listen(process.env.PORT,()=>{
+    server.listen(PORT,()=>{
         console.log("server is successfully connected");
     })
   }).catch((err)=>{
