@@ -12,8 +12,6 @@ export const fetchConversations = () => async (dispatch) => {
         console.error("Failed to fetch conversations:", error);
     }
 };
-
-
 export const handleRequest = (status, requestId) => async (dispatch) => {
     try {
         const res = await axios.post(`${BASE_URL}/request-review/${status}/${requestId}`, {}, { withCredentials: true });

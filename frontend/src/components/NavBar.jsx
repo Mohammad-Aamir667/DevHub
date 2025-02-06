@@ -1,127 +1,102 @@
-import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
-import { BASE_URL } from "../utils/constants";
-import { removeUser } from "../utils/userSlice";
-import axios from "axios";
-import { removerExpertInteractions, setAcceptedRequests, setExpertInteractions, setPendingRequests, setResolvedRequests } from "../utils/expertInteractionslice";
-import { clearFeed } from "../utils/feedSlice";
-import { clearExpertData, updateExpertStatus } from "../utils/expertDetailsSlice";
-import { setInteractions } from "../utils/interactionSlice";
+import { useDispatch, useSelector } from "react-redux"
+import { Link, useNavigate } from "react-router-dom"
+import { BASE_URL } from "../utils/constants"
+import { removeUser } from "../utils/userSlice"
+import axios from "axios"
+import { removerExpertInteractions } from "../utils/expertInteractionslice"
+import { clearFeed } from "../utils/feedSlice"
+import { clearExpertData } from "../utils/expertDetailsSlice"
+import { Code, Bell } from "lucide-react"
 
 const NavBar = () => {
-  const user = useSelector((store) => store.user);
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const expertDetails = useSelector((store) => store.expertDetails);
-   console.log(expertDetails?.expertId)
-  // Example notification count (replace with actual state if using Redux or backend integration)
-  const notifications = useSelector((store) => store.notifications || []); // Assuming you have a notifications slice
-  const unreadCount = notifications.filter((n) => !n.read).length;
+  const user = useSelector((store) => store.user)
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  const expertDetails = useSelector((store) => store.expertDetails)
+  const notifications = useSelector((store) => store.notifications || [])
+  const unreadCount = notifications.filter((n) => !n.read).length
 
   const handleLogout = async () => {
     try {
-      await axios.post(BASE_URL + "/logout", {}, { withCredentials: true });
-      dispatch(removeUser());
-      dispatch(removerExpertInteractions());
-      dispatch(clearFeed());
-      dispatch(clearExpertData());
-      return navigate("/login");
+      await axios.post(BASE_URL + "/logout", {}, { withCredentials: true })
+      dispatch(removeUser())
+      dispatch(removerExpertInteractions())
+      dispatch(clearFeed())
+      dispatch(clearExpertData())
+      return navigate("/login")
     } catch (err) {
-      console.log(err);
-      alert("Something went wrong");
+      console.error(err)
+      alert("Something went wrong")
     }
-  };
- 
- 
+  }
+
   return (
-    <div className="fixed z-30 navbar bg-vibrantClay text-white">
-      <div className="flex-1">
-        <Link to="/" className="btn btn-ghost text-xl text-gray-700">
-          DevHub
-        </Link>
-      </div>
-      <div className="flex-none gap-4">
-        {user && (
-          <div className="flex items-center gap-4">
-            {/* Notification Badge */}
-            <div className="relative">
-              <Link to="/notifications" className="btn btn-ghost btn-circle">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0a3 3 0 01-6 0m6 0H9"
-                  />
-                </svg>
+    <nav className="fixed top-0 left-0 right-0 z-30 bg-gray-900 text-gray-100 shadow-lg">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          <div className="flex items-center">
+            <Link to="/" className="flex items-center space-x-2">
+              <Code className="h-8 w-8 text-blue-500" />
+              <span className="text-xl font-bold">DevHub</span>
+            </Link>
+          </div>
+          {user && (
+            <div className="flex items-center space-x-4">
+              <Link to="/notifications" className="relative p-1 rounded-full hover:bg-gray-800 transition-colors">
+                <Bell className="h-6 w-6" />
                 {unreadCount > 0 && (
-                  <span className="absolute top-0 right-0 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">
+                  <span className="absolute top-0 right-0 inline-flex items-center justify-center w-4 h-4 text-xs font-bold text-white bg-red-500 rounded-full">
                     {unreadCount}
                   </span>
                 )}
               </Link>
-            </div>
-
-            {/* User Dropdown */}
-            <div className="dropdown dropdown-end">
-              <div
-                tabIndex={0}
-                role="button"
-                className="btn btn-ghost btn-circle avatar mx-6"
-              >
-                <div className="relative w-10 h-10 rounded-full overflow-hidden border border-gray-300">
+              <div className="relative group">
+                <button className="flex items-center space-x-2 focus:outline-none">
                   <img
+                    src={user?.photoUrl || "/placeholder.svg"}
                     alt="User Avatar"
-                    src={user?.photoUrl}
-                    className="object-cover w-full h-full"
+                    className="h-8 w-8 rounded-full object-cover border-2 border-blue-500"
                   />
+                  <span className="hidden md:inline-block">{user?.name}</span>
+                </button>
+                <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md overflow-hidden shadow-xl z-10 hidden group-hover:block">
+                  <Link to="/profile" className="block px-4 py-2 text-sm hover:bg-gray-700 transition-colors">
+                    Profile
+                  </Link>
+                  <Link to="/requests" className="block px-4 py-2 text-sm hover:bg-gray-700 transition-colors">
+                    Requests
+                  </Link>
+                  {!expertDetails?.expertId && expertDetails?.status !== "approved" && (
+                    <Link
+                      to="/expert-application-form"
+                      className="block px-4 py-2 text-sm hover:bg-gray-700 transition-colors"
+                    >
+                      Apply for Expert
+                    </Link>
+                  )}
+                  {expertDetails?.expertId && expertDetails?.status === "approved" && (
+                    <Link
+                      to="/expert-dashboard"
+                      className="block px-4 py-2 text-sm hover:bg-gray-700 transition-colors"
+                    >
+                      Expert Dashboard
+                    </Link>
+                  )}
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-700 transition-colors"
+                  >
+                    Logout
+                  </button>
                 </div>
               </div>
-              <ul
-                tabIndex={0}
-                className="menu menu-sm dropdown-content bg-black rounded-box z-[1] mt-3 w-52 p-2 shadow"
-              >
-                <li>
-                  <Link to="/profile" className="justify-between">
-                    Profile
-                    <span className="badge">New</span>
-                  </Link>
-                </li>
-
-                <li>
-                  <Link to="/requests">Requests</Link>
-                </li>
-                {!expertDetails?.expertId &&
-                  expertDetails?.status !== "approved" && (
-                    <li>
-                      <Link to="/expert-application-form">
-                        Apply for Expert
-                      </Link>
-                    </li>
-                  )}
-                {expertDetails?.expertId &&
-                  expertDetails?.status === "approved" && (
-                    <li>
-                      <Link to="/expert-dashboard">Go to Expert Dashboard</Link>
-                    </li>
-                  )}
-                <li>
-                  <a onClick={handleLogout}>Logout</a>
-                </li>
-              </ul>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
-    </div>
-  );
-};
+    </nav>
+  )
+}
 
-export default NavBar;
+export default NavBar
+

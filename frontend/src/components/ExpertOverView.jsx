@@ -19,7 +19,7 @@ const ExpertOverView = () => {
          const [showToast,setShowToast] = useState(false);
          const {  expertise, experienceYears,expertId,description} = expertDetails;
          const interaction = useSelector((store) =>
-          store.userInteractions.find((interaction) => interaction.expertId._id === expertDetails.expertId._id)
+          store.userInteractions.find((interaction) => interaction.expertId === expertDetails.expertId._id)
         );
         console.log(interaction)
           const onClose = useCallback(() => {
@@ -35,9 +35,9 @@ const ExpertOverView = () => {
           }
          try{ 
           const res = await axios.post(BASE_URL+"/request-help/"+expertId._id,{issueDescription,codeSnippet},{withCredentials:true});
-           setShowToast(true);
+           console.log(res.data)
+          setShowToast(true);
            dispatch(addInteraction(res.data));
-         
            setIsModalOpen(false);
         }
         catch(err){

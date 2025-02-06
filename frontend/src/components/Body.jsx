@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import NavBar from './NavBar'
-import { Outlet, useNavigate } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import {BASE_URL} from '../utils/constants'
 import { useDispatch, useSelector } from 'react-redux'
@@ -13,7 +13,12 @@ import { setAcceptedRequests, setExpertInteractions, setPendingRequests, setReso
 const Body = () =>{
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const user = useSelector((store)=>store.user);
+  const hideNavBarPaths = ["/chat-list","/chat-box"];
+  const shouldHideNavBar = hideNavBarPaths.some((path)=>
+    location.pathname.startsWith(path.replace(":id",""))
+  );
   const fetchUser = async ()=>{
      if(user) return;
     try{   
@@ -36,12 +41,13 @@ else alert(err.response.data)
 useEffect(()=>{
   fetchUser(); 
  
-},[])
+},[]);
+
  
   return (
     <div>
-     <NavBar/>
-     <div className="flex-1 pt-20 pb-20"> 
+     { !shouldHideNavBar && <NavBar/>}
+     <div className="flex-1 pt-8 pb-20"> 
         <Outlet />
       </div>
      <BottomNavigation/>

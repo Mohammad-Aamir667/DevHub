@@ -48,8 +48,6 @@ const ViewRequests = () => {
       <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-6 text-center">
         My {role === "expert" ? "Expert" : "User"} Requests
       </h1>
-
-      {/* Category Buttons */}
       <div className="flex flex-wrap justify-center gap-2 sm:gap-4 mb-6">
         {["pending", "accepted", "declined", "resolved"].map((category) => (
           <button
@@ -77,12 +75,8 @@ const ViewRequests = () => {
          {role === "expert" && selectedCategory === "accepted" && (
         <AcceptedRequests
         acceptedRequests={interactions}  handleResolved={onRequestResolved} handleCardClick={onCardClick}
-           // Handle Accept/Decline actions
-         // handleResolve={(id) => console.log("Resolved:", id)} // Handle Resolve action
         />
       )}
-
-      {/* For Expert role, show request cards when selectedCategory is not "pending" */}
       {role === "expert" && (selectedCategory !== "pending" && selectedCategory !== "accepted") && (
         <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {interactions?.map((request) => (
@@ -131,7 +125,6 @@ const ViewRequests = () => {
         </div>
       )}
 
-      {/* For User role, show all categories (pending and non-pending) */}
       {role === "user" && (
         <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {interactions?.map((request) => (
