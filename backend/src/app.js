@@ -1,3 +1,4 @@
+require("dotenv").config()
 const express = require("express");
 const connectDB = require("./config/db");
 const app = express();
@@ -7,7 +8,6 @@ const http = require('http');
 const socketIo = require('socket.io');
 const server = http.createServer(app);
 const socketManager =   require('./sockets/index');
-require("dotenv").config()
 const io = socketIo(server, {
   cors: {
     origin: "http://localhost:5174", 
@@ -44,7 +44,7 @@ app.use("/",adminRouter);
 app.use("/",interactionRouter);
 connectDB().then(()=>{
     console.log("connected successfully")
-    server.listen(PORT,()=>{
+    server.listen(PORT,"0.0.0.0",()=>{
         console.log("server is successfully connected");
     })
   }).catch((err)=>{
