@@ -80,7 +80,7 @@ authRouter.post("/forget-password",async(req,res)=>{
         service: 'Gmail', 
         auth: {
           user: 'aamireverlasting786@gmail.com',  
-          pass: 'vlry sqds golz ocbt',   
+          pass: process.env.GMAIL_PASS_KEY , 
         },
       });
       await transporter.sendMail({

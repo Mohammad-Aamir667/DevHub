@@ -12,7 +12,7 @@ async function createSuperAdmin() {
             console.log("Super Admin already exists. No action taken.");
             return;
         }
-        const hashedPassword = await bcrypt.hash(SUPER_ADMIN_PASSWORD, 10);
+        const hashedPassword = await bcrypt.hash(process.env.SUPER_ADMIN_PASSWORD, 10);
         const superAdmin = new User({
             firstName: "Mohammad",
             lastName: "Aamir",
