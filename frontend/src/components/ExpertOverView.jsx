@@ -21,8 +21,6 @@ const ExpertOverView = () => {
          const interaction = useSelector((store) =>
           store.userInteractions.find((interaction) => interaction.expertId._id === expertDetails.expertId._id)
         );
-            //  const interaction = useSelector((store)=>store.userInteractions);
-            //  console.log(interaction);
           const fetchUserInteractions = async ()=>{
             const userInteractions = await axios.get(BASE_URL + "/user-interactions", { withCredentials: true });
              
