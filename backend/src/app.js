@@ -11,7 +11,7 @@ const socketManager =   require('./sockets/index');
 const allowedOrigins = ['https://dev-hub-git-main-mohammad-aamirs-projects-6fa1bba5.vercel.app'];
 const io = socketIo(server, {
   cors: {
-    origin: allowedOrigins , 
+    origin: "*" , 
     methods: ["GET", "POST"], 
     allowedHeaders: ["Content-Type"], 
   },
@@ -19,7 +19,7 @@ const io = socketIo(server, {
 socketManager(io);
 app.use(express.json());
 app.use(cors({
-  origin:allowedOrigins ,
+  origin:"*" ,
   credentials:true,
 }));
 app.use(cookieParser());
