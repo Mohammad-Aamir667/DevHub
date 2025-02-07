@@ -10,7 +10,7 @@ const server = http.createServer(app);
 const socketManager =   require('./sockets/index');
 const io = socketIo(server, {
   cors: {
-    origin: "https://dev-hub-one.vercel.app/", 
+    origin: "https://dev-hub-one.vercel.app", 
     methods: ["GET", "POST"], 
     allowedHeaders: ["Content-Type"], 
     credentials: true,
@@ -19,7 +19,7 @@ const io = socketIo(server, {
 socketManager(io);
 app.use(express.json());
 app.use(cors({
-  origin: "https://dev-hub-one.vercel.app/", 
+  origin: "https://dev-hub-one.vercel.app", 
   credentials:true,
   methods: "GET,POST,PUT,DELETE",
 }));
