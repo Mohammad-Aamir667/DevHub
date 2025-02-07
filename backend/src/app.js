@@ -8,9 +8,10 @@ const http = require('http');
 const socketIo = require('socket.io');
 const server = http.createServer(app);
 const socketManager =   require('./sockets/index');
+const allowedOrigins = ['https://dev-hub-git-main-mohammad-aamirs-projects-6fa1bba5.vercel.app'];
 const io = socketIo(server, {
   cors: {
-    origin: "*", 
+    origin: allowedOrigins , 
     methods: ["GET", "POST"], 
     allowedHeaders: ["Content-Type"], 
   },
@@ -18,7 +19,7 @@ const io = socketIo(server, {
 socketManager(io);
 app.use(express.json());
 app.use(cors({
-  origin:"*",
+  origin:allowedOrigins ,
   credentials:true,
 }));
 app.use(cookieParser());
