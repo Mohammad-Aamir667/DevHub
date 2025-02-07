@@ -27,7 +27,11 @@ authRouter.post("/signup", async (req, res)=>{
         const token = await user.getJWT();
         const userData = user.toObject();
         delete userData.password;
-        res.cookie("token",token);
+        res.cookie("token", token, {
+          httpOnly: true,
+          secure: true,  // ✅ Required for HTTPS (Render & Vercel)
+          sameSite: "none",  // ✅ Allow cross-origin cookies
+        });
         res.json(userData);
 }
 catch(err){
@@ -47,6 +51,11 @@ authRouter.post("/login",async (req,res)=>{
         const token = await user.getJWT();
         const userData = user.toObject();
             delete userData.password;
+            res.cookie("token", token, {
+              httpOnly: true,
+              secure: true,  // ✅ Required for HTTPS (Render & Vercel)
+              sameSite: "none",  // ✅ Allow cross-origin cookies
+            });
         res.cookie("token",token);
         res.json(userData);
      }

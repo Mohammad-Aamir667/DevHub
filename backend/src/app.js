@@ -12,7 +12,7 @@ const io = socketIo(server, {
   cors: {
     origin: "https://dev-hub-one.vercel.app", 
     methods: ["GET", "POST"], 
-    allowedHeaders: ["Content-Type"], 
+    allowedHeaders: ["Content-Type", "Authorization"], 
     credentials: true,
   },
 });
@@ -22,6 +22,7 @@ app.use(cors({
   origin: "https://dev-hub-one.vercel.app", 
   credentials:true,
   methods: "GET,POST,PUT,DELETE",
+  allowedHeaders: ["Content-Type", "Authorization"],
 }));
 app.use(cookieParser());
 
