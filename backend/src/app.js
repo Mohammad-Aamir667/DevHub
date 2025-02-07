@@ -8,7 +8,7 @@ const http = require('http');
 const socketIo = require('socket.io');
 const server = http.createServer(app);
 const socketManager =   require('./sockets/index');
-const allowedOrigins = ['dev-hub-git-main-mohammad-aamirs-projects-6fa1bba5.vercel.app'];
+const allowedOrigins = 'http://dev-hub-one.vercel.app';
 const io = socketIo(server, {
   cors: {
     origin: allowedOrigins , 
