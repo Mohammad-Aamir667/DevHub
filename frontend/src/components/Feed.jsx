@@ -76,11 +76,14 @@ const Feed = () => {
         </div>
       </div>
 
-      <div className="mt-24 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {filteredFeed?.map((feedUser) => (
-          <FeedCard key={feedUser?._id} feedUser={feedUser} />
-        ))}
-      </div>
+      <div className="mt-24 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+  {filteredFeed?.length > 0 ? (
+    filteredFeed.map((feedUser) => <FeedCard key={feedUser?._id} feedUser={feedUser} />)
+  ) : (
+    <p className="text-center text-gray-400 col-span-full">No developers found.</p>
+  )}
+</div>
+
 
       {isLoading && (
         <div className="text-center text-gray-400 mt-8">
