@@ -46,8 +46,10 @@ interactionRouter.post("/request-help/:expertId", userAuth, async (req, res) => 
       status: "pending",
       expertDetailsId:expert._id,
     });
+    await newInteraction.save();
+    const data = await Interaction.findById(newInteraction._id)
+    .populate("expertId", "firstName lastName photoUrl");
 
-    const data = await newInteraction.save();
     console.log("Response Data:", data); // Log the response data here
     res.status(201).json(data);
   } catch (err) {
