@@ -4,7 +4,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { BASE_URL } from '../utils/constants';
 import Toast from './Toast';
 import { useDispatch, useSelector } from 'react-redux';
-import { addInteraction } from '../utils/interactionSlice';
+import { addInteraction, setInteractions } from '../utils/interactionSlice';
 
 
 const ExpertOverView = () => {
@@ -19,9 +19,21 @@ const ExpertOverView = () => {
          const [showToast,setShowToast] = useState(false);
          const {  expertise, experienceYears,expertId,description} = expertDetails;
          const interaction = useSelector((store) =>
-          store.userInteractions.find((interaction) => interaction.expertId === expertDetails.expertId._id)
+          store.userInteractions.find((interaction) => interaction.expertId._id === expertDetails.expertId._id)
         );
-        console.log(interaction)
+            //  const interaction = useSelector((store)=>store.userInteractions);
+            //  console.log(interaction);
+          const fetchUserInteractions = async ()=>{
+            const userInteractions = await axios.get(BASE_URL + "/user-interactions", { withCredentials: true });
+             
+            if (userInteractions) {
+              dispatch(setInteractions(userInteractions.data));
+            }
+          }
+          useEffect(()=>{
+            fetchUserInteractions();
+          },[])
+        
           const onClose = useCallback(() => {
              setShowToast(false); 
            }, [])

@@ -37,10 +37,7 @@ const Login = () => {
       if (expertDetails) {
         dispatch(updateExpertStatus(expertDetails.data));
       }
-      const userInteractions = await axios.get(BASE_URL + "/user-interactions", { withCredentials: true });
-      if (userInteractions) {
-        dispatch(setInteractions(userInteractions.data));
-      }
+   
       const expertAllInteractions = await axios.get(BASE_URL + "/expert/all-requests", { withCredentials: true });
       if (expertAllInteractions) {
         dispatch(setExpertInteractions(expertAllInteractions.data));
