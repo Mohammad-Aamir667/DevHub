@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchConversations } from "../utils/store";
 import { Link, useNavigate } from "react-router-dom";
 import { FiUsers } from "react-icons/fi";
+import { PlusCircle } from "lucide-react";
 
 const ChatList = () => {
     const dispatch = useDispatch();
