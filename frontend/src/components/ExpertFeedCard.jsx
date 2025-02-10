@@ -1,78 +1,46 @@
-import { useDispatch, useSelector } from "react-redux";
-import { removeFeed } from "../utils/feedSlice";
-import axios from "axios";
-import { BASE_URL } from "../utils/constants";
-import { useNavigate } from "react-router-dom";
-import { UserX, UserCheck } from "lucide-react";
+import { Image } from "lucide-react";
+import React from "react";
+import { Link } from "react-router-dom";
 
-const FeedCard = ({ feedUser }) => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const loggedInUser = useSelector((store) => store.user);
-  const fromUserId = loggedInUser?._id;
-
-  const { firstName, lastName, photoUrl, about, _id } = feedUser;
-
-  const viewProfile = (feedUser) => {
-    navigate(`/view-profile`, { state: { userProfile: feedUser } });
-  };
-
-  const requestSend = async (status) => {
-    try {
-      await axios.post(
-        `${BASE_URL}/request/send/${status}/${_id}`,
-        { fromUserId },
-        {
-          withCredentials: true,
-        }
-      );
-      dispatch(removeFeed(_id));
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
+const ExpertFeedCard = ({ expertDetails }) => {
+  const { expertise, experienceYears, expertId } = expertDetails
+    
   return (
-    feedUser && (
-      <div className="bg-gray-800 shadow-lg rounded-lg overflow-hidden transition-transform duration-300 hover:scale-105 w-full sm:w-48">
-        <div onClick={() => viewProfile(feedUser)} className="cursor-pointer">
-          <div className="relative h-20 bg-gradient-to-r from-gray-500 to-gray-600">
-            <img
-              src={photoUrl || "/placeholder.svg"}
-              alt={`${firstName} ${lastName}`}
-              className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 w-16 h-16 rounded-full border-4 border-gray-800 object-cover"
-            />
-          </div>
-          <div className="pt-10 pb-2 px-2 text-center">
-            <h2 className="text-sm font-semibold text-white mb-1">
-              {firstName} {lastName}
-            </h2>
-            <p className="text-xs text-gray-400 mb-2 h-10 overflow-hidden">
-              {about?.length > 40
-                ? `${about.substring(0, 40)}...`
-                : about || "No details provided"}
-            </p>
-          </div>
+    <div className="bg-gray-800 shadow-lg rounded-xl p-6 transition-all duration-300 hover:shadow-xl hover:bg-gray-750">
+      {/* Profile Image & Info */}
+      <div className="flex items-center space-x-4 mb-4">
+        <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-blue-400">
+          <img
+            src={expertId?.photoUrl || "/placeholder.svg"}
+            alt={expertId?.firstName}
+            layout="fill"
+            objectFit="cover"
+          />
         </div>
-        <div className="px-2 pb-2 flex justify-between gap-2">
-          <button
-            onClick={() => requestSend("ignored")}
-            className="flex-1 bg-gray-700 text-gray-300 hover:bg-gray-600 px-2 py-1 rounded-full flex items-center justify-center text-xs transition-colors duration-300"
-          >
-            <UserX size={14} className="mr-1" />
-            Ignore
-          </button>
-          <button
-            onClick={() => requestSend("interested")}
-            className="flex-1 bg-blue-600 text-white hover:bg-blue-700 px-2 py-1 rounded-full flex items-center justify-center text-xs transition-colors duration-300"
-          >
-            <UserCheck size={14} className="mr-1" />
-            Interested
-          </button>
+        <div className="flex-1">
+          <h3 className="text-lg font-semibold text-gray-100">
+            {expertId?.firstName} {expertId?.lastName}
+          </h3>
+          <p className="text-sm text-gray-300">{expertise.join(", ")}</p>
         </div>
       </div>
-    )
-  );
-};
 
-export default FeedCard;
+      {/* Experience */}
+      <p className="text-sm text-gray-400 mb-4">Experience: {experienceYears} years</p>
+
+      {/* Action Button */}
+      <div className="mt-4">
+        <Link
+          to={`/expert/${expertId?._id}`}
+          state={{ expertDetails }}
+         className="block w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all text-center"
+        >
+          View Profile
+        </Link>
+      </div>
+    </div>
+  )
+}
+
+
+export default ExpertFeedCard;
