@@ -1,3 +1,5 @@
+"use client"
+
 import axios from "axios"
 import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
@@ -62,13 +64,13 @@ const Feed = () => {
   )
 
   return (
-    <div className="min-h-screen bg-gray-900 py-8 px-4">
-      <div className="fixed top-16 left-0 w-full bg-gray-800 shadow-md z-20 p-3">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 py-8 px-4">
+      <div className="fixed top-0 left-0 w-full bg-white dark:bg-gray-800 shadow-md z-20 p-4">
         <div className="max-w-3xl mx-auto relative">
           <input
             type="text"
             placeholder="Search developers..."
-            className="w-full p-2 pl-10 bg-gray-700 text-white border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full p-3 pl-10 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -76,22 +78,23 @@ const Feed = () => {
         </div>
       </div>
 
-    <div className="mt-28 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-  {filteredFeed?.length > 0 ? (
-    filteredFeed.map((feedUser) => <FeedCard key={feedUser?._id} feedUser={feedUser} />)
-  ) : (
-    <p className="text-center text-gray-400 col-span-full">No developers found.</p>
-  )}
-</div>
-
+      <div className="mt-24 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {filteredFeed?.length > 0 ? (
+          filteredFeed.map((feedUser) => <FeedCard key={feedUser?._id} feedUser={feedUser} />)
+        ) : (
+          <p className="text-center text-gray-500 dark:text-gray-400 col-span-full">No developers found.</p>
+        )}
+      </div>
 
       {isLoading && (
-        <div className="text-center text-gray-400 mt-8">
+        <div className="text-center text-gray-500 dark:text-gray-400 mt-8">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
           <p className="mt-2">Loading more developers...</p>
         </div>
       )}
-      {!hasMore && <div className="text-center text-gray-400 mt-8">No more developers to display.</div>}
+      {!hasMore && (
+        <div className="text-center text-gray-500 dark:text-gray-400 mt-8">No more developers to display.</div>
+      )}
     </div>
   )
 }
