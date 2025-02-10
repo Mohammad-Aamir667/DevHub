@@ -9,7 +9,7 @@ const BottomNavigation = () => {
 
   if (!user) return null;
   return (
-    <div className="fixed z-30 bottom-0 left-0 w-full bg-gray-800 border-t border-gray-700 shadow-lg">
+    <div className="fixed z-30 bottom-0 left-0  w-full bg-gray-800 border-t border-gray-700 shadow-lg">
       <div className="flex justify-around items-center py-2 max-w-md mx-auto">
         <Link
           to="/"

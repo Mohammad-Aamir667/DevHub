@@ -15,8 +15,12 @@ const Body = () =>{
   const navigate = useNavigate();
   const location = useLocation();
   const user = useSelector((store)=>store.user);
-  const hideNavBarPaths = ["/chat-list","/chat-box"];
-  const shouldHideNavBar = hideNavBarPaths.some((path)=>
+  const hideTopNavBarPaths = ["/chat-list","/chat-box",];
+  const shouldTopHideNavBar = hideTopNavBarPaths.some((path)=>
+    location.pathname.startsWith(path.replace(":id",""))
+  );
+  const hideBotNavBarPaths = ["/chat-box"];
+  const shouldBotHideNavBar = hideBotNavBarPaths.some((path)=>
     location.pathname.startsWith(path.replace(":id",""))
   );
   const fetchUser = async ()=>{
@@ -46,11 +50,11 @@ useEffect(()=>{
  
   return (
     <div>
-     { !shouldHideNavBar && <NavBar/>}
-     <div className="flex-1 pt-8 pb-20"> 
+     { !shouldTopHideNavBar && <NavBar/>}
+     <div className="flex-1  pb-20"> 
         <Outlet />
       </div>
-     <BottomNavigation/>
+   {!shouldBotHideNavBar && <BottomNavigation/>}
     </div>
   )
 }

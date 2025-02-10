@@ -36,7 +36,7 @@ const FeedCard = ({ feedUser }) => {
     feedUser && (
       <div className="bg-gray-800 shadow-lg rounded-lg overflow-hidden transition-transform duration-300 hover:scale-105 w-48"> 
         <div onClick={() => viewProfile(feedUser)} className="cursor-pointer">
-          <div className="relative h-20 bg-gradient-to-r from-blue-500 to-purple-600"> 
+          <div className="relative h-20 bg-gradient-to-r  from-gray-500 to-gray-600"> 
             <img
               src={photoUrl || "/placeholder.svg"}
               alt={`${firstName} ${lastName}`}

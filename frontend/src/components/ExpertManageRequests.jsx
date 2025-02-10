@@ -9,7 +9,7 @@ const ExpertManageRequests = ({ pendingRequests, handleRequest }) => {
 
         return (
           <div key={_id} className="space-y-4">
-            <div className="p-4 bg-gray-50 rounded-lg flex justify-between items-center">
+            <div className="p-4 bg-gray-50 rounded-lg mt-9 flex justify-between items-center">
               <div>
                 <h4 className="text-sm font-medium text-gray-800">{firstName + " " + lastName}</h4>
                 <p className="text-xs text-gray-600">{issueDescription}</p>

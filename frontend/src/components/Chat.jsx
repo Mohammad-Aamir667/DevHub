@@ -130,7 +130,7 @@ const Chat = () => {
   
 
   return (
-    <div className="flex flex-col h-screen max-w-md mx-auto bg-dark-charcoal shadow-lg rounded-lg overflow-hidden">
+    <div className="flex flex-col h-screen pb-4 fixed w-full bg-dark-charcoal shadow-lg rounded-lg overflow-hidden">
       <div className="flex items-center p-4 bg-gray-800 text-soft-white">
         <button
           onClick={() => navigate(-1)}
@@ -192,7 +192,7 @@ const Chat = () => {
           placeholder="Type your message..."
           className="flex-grow bg-gray-700 text-soft-white rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-electric-blue"
         />
-        {(messageText || file) && (
+        {(messageText.trim() || file) && (
           <button
             onClick={file ? handleFileUpload : handleSendMessage}
             className="bg-electric-blue text-soft-white rounded-full p-2 hover:bg-blue-600 transition duration-200"

@@ -26,7 +26,7 @@ const ChatList = () => {
     };
 
     return (
-        <div className="chat-list p-6 space-y-4 bg-dark-charcoal min-h-screen">
+        <div className="chat-list p-6 space-y-4 bg-gray-900  min-h-screen">
             <h2 className="text-2xl font-bold text-soft-white mb-4">Chats</h2>
             
             {/* Create Group Chat Button */}

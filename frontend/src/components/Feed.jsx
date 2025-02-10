@@ -76,7 +76,7 @@ const Feed = () => {
         </div>
       </div>
 
-      <div className="mt-24 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <div className="mt-28 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
   {filteredFeed?.length > 0 ? (
     filteredFeed.map((feedUser) => <FeedCard key={feedUser?._id} feedUser={feedUser} />)
   ) : (

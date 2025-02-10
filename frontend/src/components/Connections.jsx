@@ -38,7 +38,7 @@ const Connections = () => {
     );
 
   return (
-    <div className="min-h-screen bg-dark-charcoal p-6 flex flex-col items-center">
+    <div className="min-h-screen bg-gray-900  p-6 flex flex-col items-center">
       {/* Back Button */}
       <div className="w-full max-w-3xl flex items-center mb-6">
         <button

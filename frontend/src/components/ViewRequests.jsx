@@ -43,7 +43,7 @@ const ViewRequests = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-200 p-6">
+    <div className="min-h-screen bg-gradient-to-b mt-9 from-gray-100 to-gray-200 p-6">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center">
           My {role === "expert" ? "Expert" : "User"} Requests
