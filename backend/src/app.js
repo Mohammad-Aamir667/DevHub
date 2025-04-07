@@ -8,18 +8,32 @@ const http = require('http');
 const socketIo = require('socket.io');
 const server = http.createServer(app);
 const socketManager =   require('./sockets/index');
+
+const allowedOrigins = [
+  "https://dev-hub-one.vercel.app",
+  "http://localhost:5173"
+];
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
+
 const io = socketIo(server, {
   cors: {
-    origin: "https://dev-hub-one.vercel.app", 
-    methods: ["GET", "POST"], 
-    allowedHeaders: ["Content-Type", "Authorization"], 
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   },
 });
+
 socketManager(io);
 app.use(express.json());
 app.use(cors({
-  origin: "https://dev-hub-one.vercel.app", 
+  origin: allowedOrigins, 
   credentials:true,
   methods: "GET,POST,PUT,DELETE",
   allowedHeaders: ["Content-Type", "Authorization"],
@@ -35,7 +49,7 @@ const fileRouter = require("./routes/files");
 const expertRouter = require("./routes/expert");
 const adminRouter = require("./routes/admin");
 const interactionRouter = require("./routes/interaction");
-const PORT = process.env.PORT || 10000
+const PORT = process.env.PORT 
 app.use("/",authRouter);
 app.use("/",profileRouter);
 app.use("/",requestRouter);
