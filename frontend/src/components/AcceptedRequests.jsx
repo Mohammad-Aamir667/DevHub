@@ -1,6 +1,7 @@
 import React from 'react';
 
 const AcceptedRequests = ({ acceptedRequests, handleCardClick, handleResolved }) => {
+    
   return (
     <div>
       <div >

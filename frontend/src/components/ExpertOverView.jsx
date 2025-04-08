@@ -19,27 +19,12 @@ const ExpertOverView = () => {
 
   const { expertise, experienceYears, expertId, description } = expertDetails;
   const interaction = useSelector((store) =>
-    store.userInteractions.find(
+    store?.userInteractions?.find(
       (interaction) => interaction.expertId._id === expertDetails.expertId._id
     )
   );
 
-  const fetchUserInteractions = async () => {
-    try {
-      const userInteractions = await axios.get(
-        BASE_URL + "/user-interactions",
-        { withCredentials: true }
-      );
-      dispatch(setInteractions(userInteractions.data));
-    } catch (err) {
-      console.error("Error fetching interactions:", err);
-    }
-  };
-
-  useEffect(() => {
-    fetchUserInteractions();
-  }, []);
-
+ 
   const onClose = useCallback(() => {
     setShowToast(false);
   }, []);

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars, faTimes, faList, faClock, faCheckCircle, faStar, faComment } from "@fortawesome/free-solid-svg-icons";
 import { Link, useNavigate } from "react-router-dom";
@@ -8,21 +8,38 @@ import { useDispatch, useSelector } from "react-redux";
 import AcceptedRequests from "./AcceptedRequests";
 import ExpertManageRequests from "./ExpertManageRequests";
 import { handleCardClick, handleRequest, handleResolved } from "../utils/store";
+import {  setExpertInteractions} from "../utils/expertInteractionslice";
+import axios from "axios";
+import { BASE_URL } from "../utils/constants";
 
 const ExpertDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const totalRequests = useSelector((store) => store.expertInteractions);
-  const pendingRequests = totalRequests?.pendingRequests;
-  const acceptedRequests = totalRequests?.acceptedRequests;
-  const resolvedRequests = totalRequests?.resolvedRequests;
+   console.log(totalRequests, "totalRequests");
+  const pendingRequests = totalRequests?.filter((request) => request.status === "pending") || [];
+  const acceptedRequests = totalRequests?.filter((request) => request.status === "accepted") || [];
+  const resolvedRequests =  totalRequests?.filter((request) => request.status === "resolved") || [];
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
+  const handleExpert =  async()=>{
+    try{
+      const expertAllInteractions = await axios.get(BASE_URL + "/expert/all-requests", { withCredentials: true });
+      if (expertAllInteractions) {
+        dispatch(setExpertInteractions(expertAllInteractions.data));
+      }
+    }
+    catch(err){
+      console.error("Error fetching interactions:", err);
+    }
+      
+  }
   const onRequestHandle = (status, requestId) => {
+    console.log(status, requestId, "status and requestId");
     dispatch(handleRequest(status, requestId));
   };
 
   const onRequestResolved = (requestId) => {
+    console.log(requestId, "requestId");
     dispatch(handleResolved(requestId));
   };
 
@@ -33,6 +50,13 @@ const ExpertDashboard = () => {
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
+  useEffect(() => {
+   
+      if(totalRequests?.length === 0)
+      handleExpert();
+    
+  }, []); 
+  
 
   return (
     <div className="min-h-screen flex mt-16 bg-gray-900 text-gray-100">
@@ -103,7 +127,7 @@ const ExpertDashboard = () => {
           <div className="bg-gray-800 p-4 shadow rounded-lg flex items-center justify-between">
             <div>
               <h3 className="text-lg font-semibold text-gray-400">Total Requests</h3>
-              <p className="text-2xl font-bold text-blue-400">{totalRequests?.interactions?.length}</p>
+              <p className="text-2xl font-bold text-blue-400">{totalRequests?.length}</p>
             </div>
             <div className="text-blue-500">
               <FontAwesomeIcon icon={faList} size="2x" />

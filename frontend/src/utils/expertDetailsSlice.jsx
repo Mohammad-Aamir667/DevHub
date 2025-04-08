@@ -68,17 +68,15 @@ const expertDetailsSlice = createSlice({
       state.rating = rating || 0;
     },
 
-    // Update only specific fields
+    
     updateExpertField(state, action) {
       const { field, value } = action.payload;
       state[field] = value;
     },
 
-    // Add a new review
     addReview(state, action) {
       const { reviewer, rating, comment, date } = action.payload;
       state.reviews.push({ reviewer, rating, comment, date });
-      // Recalculate average rating
       const totalRatings = state.reviews.reduce((sum, review) => sum + review.rating, 0);
       state.rating = (totalRatings / state.reviews.length).toFixed(1);
     },

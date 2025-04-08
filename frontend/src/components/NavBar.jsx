@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom"
 import { BASE_URL } from "../utils/constants"
 import { removeUser } from "../utils/userSlice"
 import axios from "axios"
-import { removerExpertInteractions } from "../utils/expertInteractionslice"
+
 import { clearFeed } from "../utils/feedSlice"
 import { clearExpertData } from "../utils/expertDetailsSlice"
 import { Code, Bell } from "lucide-react"
@@ -20,7 +20,7 @@ const NavBar = () => {
     try {
       await axios.post(BASE_URL + "/logout", {}, { withCredentials: true })
       dispatch(removeUser())
-      dispatch(removerExpertInteractions())
+     // dispatch(removerExpertInteractions())
       dispatch(clearFeed())
       dispatch(clearExpertData())
       return navigate("/login")
@@ -29,7 +29,7 @@ const NavBar = () => {
       alert("Something went wrong")
     }
   }
-
+   
   return (
     <nav className="fixed top-0 left-0 right-0 z-30 bg-gray-900 text-gray-100 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

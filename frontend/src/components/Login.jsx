@@ -4,9 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addUser } from '../utils/userSlice';
 import { useNavigate } from 'react-router-dom';
 import { BASE_URL } from '../utils/constants';
-import { updateExpertStatus } from '../utils/expertDetailsSlice';
 import { setInteractions } from '../utils/interactionSlice';
-import { setAcceptedRequests, setExpertInteractions, setPendingRequests, setResolvedRequests } from '../utils/expertInteractionslice';
 
 const Login = () => {
   const [emailId, setEmailId] = useState("ayat123@gmail.com");
@@ -20,11 +18,11 @@ const Login = () => {
   const navigate = useNavigate();
   const user = useSelector((store) => store.user);
 
-  useEffect(() => {
-    if (user) {
-      navigate('/');
-    }
-  }, [user, navigate]);
+  // useEffect(() => {
+  //   if (user ) {
+  //     navigate('/');
+  //   }
+  // }, [user, navigate]);
 
   const handleLogin = async () => {
     try {
@@ -33,27 +31,7 @@ const Login = () => {
         password,
       }, { withCredentials: true });
       dispatch(addUser(res.data));
-      const expertDetails = await axios.get(BASE_URL + "/expert-details", { withCredentials: true });
-      if (expertDetails) {
-        dispatch(updateExpertStatus(expertDetails.data));
-      }
-   
-      const expertAllInteractions = await axios.get(BASE_URL + "/expert/all-requests", { withCredentials: true });
-      if (expertAllInteractions) {
-        dispatch(setExpertInteractions(expertAllInteractions.data));
-      }
-      const expertPendingInteractions = await axios.get(BASE_URL + "/expert/pending-requests", { withCredentials: true });
-      if (expertPendingInteractions) {
-        dispatch(setPendingRequests(expertPendingInteractions.data));
-      }
-      const expertAcceptedRequests = await axios.get(BASE_URL + "/expert/accepted-requests", { withCredentials: true });
-      if (expertAcceptedRequests) {
-        dispatch(setAcceptedRequests(expertAcceptedRequests.data));
-      }
-      const resolvedRequests = await axios.get(BASE_URL + "/expert/resolved-requests", { withCredentials: true });
-      if (resolvedRequests) {
-        dispatch(setResolvedRequests(resolvedRequests.data));
-      }
+     
       return navigate("/");
     } catch (err) {
       console.log(err);

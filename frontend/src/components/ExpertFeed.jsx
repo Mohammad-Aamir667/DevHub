@@ -8,6 +8,7 @@ import ExpertFeedCard from "./ExpertFeedCard";
 import { addExpertFeed } from "../utils/expertFeedSlice";
 import { Link } from "react-router-dom";
 import { Search } from 'lucide-react';
+import { setInteractions } from "../utils/interactionSlice";
 
 const ExpertFeed = () => {
   const dispatch = useDispatch();
@@ -30,6 +31,22 @@ const ExpertFeed = () => {
     };
     getExperts();
   }, [dispatch]);
+  
+  const fetchUserInteractions = async () => {
+    try {
+      const userInteractions = await axios.get(
+        BASE_URL + "/user-interactions",
+        { withCredentials: true }
+      );
+      dispatch(setInteractions(userInteractions.data));
+    } catch (err) {
+      console.error("Error fetching interactions:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserInteractions();
+  }, []);
 
   const filteredFeed = expertFeed?.filter((expert) => {
     const lowerSearch = searchTerm.toLowerCase();
@@ -45,12 +62,7 @@ const ExpertFeed = () => {
     <div className="min-h-screen bg-gradient-to-b from-dark-charcoal mt-9 py-8 bg-gray-900  p-6">
       <div className="max-w-7xl mx-auto">
         
-        {/* Fixed Header */}
         <div className="fixed top-16 left-0 w-full z-10  bg-gray-800 shadow-md py-2 px-6 flex justify-between items-center rounded-lg">
-          {/* Title */}
-          
-
-          {/* Search Bar */}
           <div className="relative w-1/2">
             <input
               type="text"
@@ -62,7 +74,7 @@ const ExpertFeed = () => {
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
           </div>
 
-          {/* View Requests Button */}
+          
           <Link
             to="/view-requests?role=user"
             className="bg-blue-400 hover:bg-blue-500 text-soft-white px-6 py-3 rounded-lg text-sm font-medium transition-all shadow-lg hover:shadow-xl"

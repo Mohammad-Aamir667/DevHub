@@ -1,11 +1,14 @@
-"use client"
-
-import { useState } from "react"
+import React from "react"
+import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { useLocation, useNavigate } from "react-router-dom"
 import AcceptedRequests from "./AcceptedRequests"
 import ExpertManageRequests from "./ExpertManageRequests"
 import { handleCardClick, handleRequest, handleResolved } from "../utils/store"
+import { setInteractions } from "../utils/interactionSlice"
+import axios from "axios"
+import { BASE_URL } from "../utils/constants"
+import {  setExpertInteractions} from "../utils/expertInteractionslice";
 
 const ViewRequests = () => {
   const navigate = useNavigate()
@@ -18,9 +21,9 @@ const ViewRequests = () => {
   const userInteractions = useSelector((store) => store.userInteractions)
   const interactions =
     role === "expert"
-      ? expertInteractions?.[`${selectedCategory}Requests`] || []
+      ? expertInteractions?.filter((request) => request.status === selectedCategory) || []
       : userInteractions?.filter((request) => request.status === selectedCategory) || []
-  const onCardClick = (userProfile) => {
+      const onCardClick = (userProfile) => {
     handleCardClick(userProfile, navigate)
   }
   const onRequestHandle = (status, requestId) => {
@@ -41,6 +44,39 @@ const ViewRequests = () => {
       return
     }
   }
+   const fetchUserInteractions = async () => {
+    try {
+      const userInteractions = await axios.get(
+        BASE_URL + "/user-interactions",
+        { withCredentials: true }
+      );
+      dispatch(setInteractions(userInteractions.data));
+    } catch (err) {
+      console.error("Error fetching interactions:", err);
+    }
+  };
+  const handleExpert =  async()=>{
+    try{
+      const expertAllInteractions = await axios.get(BASE_URL + "/expert/all-requests", { withCredentials: true });
+      if (expertAllInteractions) {
+        dispatch(setExpertInteractions(expertAllInteractions.data));
+      }
+    }
+    catch(err){
+      console.error("Error fetching interactions:", err);
+    }
+      
+  }
+
+  useEffect(() => {
+    if(!userInteractions.length) 
+    fetchUserInteractions();
+    if(!expertInteractions?.length) 
+      handleExpert();
+     
+    
+  }, []);
+
 
   return (
     <div className="min-h-screen bg-gradient-to-b mt-9 from-gray-100 to-gray-200 p-6">
