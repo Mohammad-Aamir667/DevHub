@@ -59,7 +59,7 @@ const ExpertDashboard = () => {
   
 
   return (
-    <div className="min-h-screen flex mt-16 bg-gray-900 text-gray-100">
+    <div className="min-h-screen flex  bg-gray-900 text-gray-100">
       {/* Sidebar */}
       <div
         className={`fixed z-20 inset-y-0 left-0 transform ${

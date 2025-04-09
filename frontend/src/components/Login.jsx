@@ -17,12 +17,6 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((store) => store.user);
-  
-  // useEffect(() => {
-  //   if (user ) {
-  //     navigate('/');
-  //   }
-  // }, [user, navigate]);
 
   const handleLogin = async () => {
     try {
@@ -59,9 +53,9 @@ const Login = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-dark-charcoal p-4">
+    <div className={` ${!isLoginForm?"mt-9":"mt-0"} flex justify-center items-center  min-h-screen bg-dark-charcoal p-4 overflow-auto `}>
       <div className="card bg-gray-800 w-full max-w-md shadow-xl rounded-xl">
-        <div className="card-body p-6">
+        <div className="card-body p-6 max-h-[90vh] overflow-y-auto">
           <h2 className="card-title text-2xl font-bold text-soft-white mb-6">{isLoginForm ? "Login" : "Sign Up"}</h2>
           {!isLoginForm && (
             <>
@@ -143,7 +137,7 @@ const Login = () => {
           </div>
           <div className="card-actions justify-center mt-4">
             <p className="hover:cursor-pointer text-soft-white" onClick={() => setIsLoginForm((value) => !value)}>
-              {isLoginForm ? "New User" : "Already registered"}
+              {isLoginForm ? "Don't have an account? Sign up here." : "Already have an account? Log in here."}
             </p>
           </div>
         </div>

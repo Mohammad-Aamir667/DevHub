@@ -27,10 +27,10 @@ const ChatList = () => {
 
     return (
         <div className="relative min-h-screen bg-gray-900 p-6">
-           
+            {/* Page Title */}
             <h2 className="text-3xl font-semibold text-white mb-6">Chats</h2>
 
-           
+            {/* Chat List */}
             <div className="space-y-4">
                 {conversations?.length > 0 ? (
                     conversations.map((convo) => {
@@ -81,7 +81,7 @@ const ChatList = () => {
             {/* Floating "Create Group" Button */}
             <button
                 onClick={() => navigate("/create-group-chat")}
-                className="fixed bottom-6 mb-20 right-6 flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-full shadow-lg transition-all text-sm font-medium"
+                className="fixed bottom-6 right-6 flex items-center mb-14 gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-full shadow-lg transition-all text-sm font-medium"
             >
                 <PlusCircle size={22} />
                 Create Group

@@ -14,11 +14,11 @@ const Body = () =>{
   const location = useLocation();
   const user = useSelector((store)=>store.user);
   const expertDetails = useSelector((store) => store.expertDetails)
-  const hideTopNavBarPaths = ["/chat-list","/chat-box",];
+  const hideTopNavBarPaths = ["/chat-list","/chat-box","/expert-dashboard"];
   const shouldTopHideNavBar = hideTopNavBarPaths.some((path)=>
     location.pathname.startsWith(path.replace(":id",""))
   );
-  const hideBotNavBarPaths = ["/chat-box"];
+  const hideBotNavBarPaths = ["/chat-box","/create-group-chat"];
   const shouldBotHideNavBar = hideBotNavBarPaths.some((path)=>
     location.pathname.startsWith(path.replace(":id",""))
   );
