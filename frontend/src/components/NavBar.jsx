@@ -7,6 +7,7 @@ import axios from "axios"
 import { clearFeed } from "../utils/feedSlice"
 import { clearExpertData } from "../utils/expertDetailsSlice"
 import { Code, Bell } from "lucide-react"
+import { removeExpertInteraction } from "../utils/expertInteractionslice"
 
 const NavBar = () => {
   const user = useSelector((store) => store.user)
@@ -20,9 +21,9 @@ const NavBar = () => {
     try {
       await axios.post(BASE_URL + "/logout", {}, { withCredentials: true })
       dispatch(removeUser())
-     // dispatch(removerExpertInteractions())
       dispatch(clearFeed())
-      dispatch(clearExpertData())
+      dispatch(clearExpertData());
+      removeExpertInteraction();
       return navigate("/login")
     } catch (err) {
       console.error(err)

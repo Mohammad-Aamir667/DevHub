@@ -86,7 +86,7 @@ const ViewRequests = () => {
         </h1>
         <div className="flex flex-wrap justify-center gap-4 mb-8">
           {["pending", "accepted", "declined", "resolved"].map((category) => (
-            <button
+           ( <button
               key={category}
               className={`px-6 py-3 rounded-lg text-white font-medium transition-all shadow-md ${
                 selectedCategory === category ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-500 hover:bg-gray-600"
@@ -94,7 +94,7 @@ const ViewRequests = () => {
               onClick={() => setSelectedCategory(category)}
             >
               {category.charAt(0).toUpperCase() + category.slice(1)}
-            </button>
+            </button>)
           ))}
         </div>
 

@@ -64,7 +64,7 @@ const Feed = () => {
   )
 
   return (
-    <div className="min-h-screen bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-900 py-8 px-4 sm:px-6 mt-5 lg:px-8">
       <div className="fixed top-16 left-0 w-full bg-gray-800/95 backdrop-blur-sm shadow-lg z-20 py-4 px-4 sm:px-6 lg:px-8 border-b border-gray-700">
         <div className="max-w-4xl mx-auto relative">
           <div className="relative group">

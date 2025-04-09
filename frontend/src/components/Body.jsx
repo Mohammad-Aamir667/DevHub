@@ -23,6 +23,7 @@ const Body = () =>{
     location.pathname.startsWith(path.replace(":id",""))
   );
   const fetchUser = async ()=>{
+      
     try{   
       const res = await axios.get(BASE_URL+"/profile",{
        withCredentials:true,
@@ -51,16 +52,17 @@ else alert(err.response?.data)
   
 
 useEffect(()=>{
+  if(!user)
   fetchUser();
-  if(expertDetails.expertId === null )
-  handleExpert();
-},[expertDetails]);
+ if(expertDetails.expertId === null )
+   handleExpert();
+},[expertDetails,user]);
 
  
   return (
     <div>
      { !shouldTopHideNavBar && <NavBar/>}
-     <div className="flex-1  pb-20"> 
+     <div className="flex-1 pb-20"> 
         <Outlet />
       </div>
    {!shouldBotHideNavBar && <BottomNavigation/>}

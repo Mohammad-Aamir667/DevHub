@@ -3,15 +3,15 @@ import { useNavigate } from "react-router-dom"
 import { ArrowLeft, Edit } from "lucide-react"
 
 const Profile = () => {
-  const user = useSelector((store) => store.user)
+  const user = useSelector((store) => store?.user)
   const navigate = useNavigate()
-  const { firstName, lastName, photoUrl, age, gender, about, skills } = user
+  const { firstName, lastName, photoUrl, age, gender, about, skills } = user || {}
 
   const handleEditProfile = () => {
     return navigate("/editProfile")
   }
 
-  return (
+  return user &&  (
     <div className="min-h-screen mt-16 bg-gradient-to-b from-gray-900 to-gray-800 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl mx-auto">
         <button

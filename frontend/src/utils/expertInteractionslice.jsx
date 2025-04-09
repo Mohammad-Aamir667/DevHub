@@ -14,8 +14,11 @@ const expertSlice = createSlice({
         request.status = newStatus; 
       }
     },
+    removeExpertInteraction: () => {
+        return [];
+    }
   },
 });
 
-export const { setExpertInteractions, updateRequestStatus } = expertSlice.actions;
+export const { setExpertInteractions, updateRequestStatus,removeExpertInteraction } = expertSlice.actions;
 export default expertSlice.reducer;
