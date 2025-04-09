@@ -131,7 +131,7 @@ const Chat = () => {
   };
 
   return (
-    <div className="flex flex-col h-[100dvh] w-full bg-dark-charcoal shadow-lg rounded-lg overflow-hidden">
+    <div className="flex flex-col h-screen w-full bg-dark-charcoal shadow-lg rounded-lg overflow-hidden">
       <div className="flex items-center p-4 bg-gray-800 text-soft-white">
         <button onClick={() => navigate(-1)} className="mr-4 text-electric-blue hover:text-cyan-400 transition duration-200">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
