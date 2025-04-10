@@ -10,7 +10,7 @@ const ChatList = () => {
     const conversations = useSelector((state) => state.conversations);
     const user = useSelector((state) => state.user);
     const loggedInUser = user?._id;
-
+    const connections = useSelector((state) => state.connections);
     useEffect(() => {
         dispatch(fetchConversations());
     }, [dispatch]);
@@ -79,13 +79,13 @@ const ChatList = () => {
             </div>
 
             {/* Floating "Create Group" Button */}
-            <button
+            {connections && connections?.length>0 && <button
                 onClick={() => navigate("/create-group-chat")}
                 className="fixed bottom-6 right-6 flex items-center mb-14 gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-full shadow-lg transition-all text-sm font-medium"
             >
                 <PlusCircle size={22} />
                 Create Group
-            </button>
+            </button>}
         </div>
     );
 };

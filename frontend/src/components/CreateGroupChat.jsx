@@ -46,9 +46,11 @@ const CreateGroupChat = () => {
             setError(err.response?.data?.message || "An unexpected error occurred. Please try again.");
         }
     };
-
-    return (
+   
+    return  (
+     
         <div className="min-h-screen flex items-center -mt-10 justify-center bg-gray-900 text-white p-6">
+              {connections && connections?.length>0 ?(
             <div className="max-w-3xl w-full bg-gray-800 p-6 rounded-xl shadow-lg relative">
                 {/* Back Button */}
                 <button onClick={() => navigate(-1)} className="absolute top-4 left-4 text-gray-400 hover:text-white transition">
@@ -108,7 +110,7 @@ const CreateGroupChat = () => {
                         </button>
                     )}
                 </div>
-            </div>
+            </div>):(<div>You are not connected to anyone. Please connect to create the group </div>)}
         </div>
     );
 };
