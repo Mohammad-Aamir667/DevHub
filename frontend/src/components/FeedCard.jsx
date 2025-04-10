@@ -6,6 +6,7 @@ import axios from "axios"
 import { BASE_URL } from "../utils/constants"
 import { useNavigate } from "react-router-dom"
 import { UserX, UserCheck, User } from "lucide-react"
+import { Tooltip } from "react-tooltip"
 
 const FeedCard = ({ feedUser }) => {
   const dispatch = useDispatch()
@@ -13,21 +14,15 @@ const FeedCard = ({ feedUser }) => {
   const loggedInUser = useSelector((store) => store.user)
   const fromUserId = loggedInUser?._id
 
-  const { firstName, lastName, photoUrl, about, _id } = feedUser
-
+  const { firstName, lastName, photoUrl, skills, _id } = feedUser
+  console.log(skills)
   const viewProfile = (feedUser) => {
     navigate(`/view-profile`, { state: { userProfile: feedUser } })
   }
 
   const requestSend = async (status) => {
     try {
-      await axios.post(
-        `${BASE_URL}/request/send/${status}/${_id}`,
-        { fromUserId },
-        {
-          withCredentials: true,
-        },
-      )
+      await axios.post(`${BASE_URL}/request/send/${status}/${_id}`, { fromUserId }, { withCredentials: true })
       dispatch(removeFeed(_id))
     } catch (err) {
       console.error(err)
@@ -36,48 +31,74 @@ const FeedCard = ({ feedUser }) => {
 
   return (
     feedUser && (
-      <div className="bg-gray-800 shadow-lg rounded-xl overflow-hidden transition-all duration-300 hover:scale-102 hover:shadow-xl border border-gray-700 h-full flex flex-col">
+      <div className="bg-gray-900 shadow-lg rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl border border-gray-800 h-64 flex flex-col justify-between">
+        {/* Card Header with Profile Image */}
         <div onClick={() => viewProfile(feedUser)} className="cursor-pointer flex-1 flex flex-col">
-          <div className="relative h-16 sm:h-20 bg-gradient-to-r from-gray-700 to-gray-800">
-            {photoUrl ? (
-              <img
-                src={photoUrl || "/placeholder.svg"}
-                alt={`${firstName} ${lastName}`}
-                className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 w-14 h-14 sm:w-16 sm:h-16 rounded-full border-3 border-gray-800 object-cover shadow-md"
-              />
-            ) : (
-              <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 w-14 h-14 sm:w-16 sm:h-16 rounded-full border-3 border-gray-800 bg-gray-600 flex items-center justify-center shadow-md">
-                <User className="w-7 h-7 text-gray-300" />
-              </div>
-            )}
+          <div className="relative h-20 bg-gradient-to-r from-gray-800 to-gray-900">
+            <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 w-14 h-14 rounded-full border-4 border-gray-900 shadow-md overflow-hidden">
+              {photoUrl ? (
+                <img
+                  src={photoUrl || "/placeholder.svg"}
+                  alt={`${firstName} ${lastName}`}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-gray-700 flex items-center justify-center">
+                  <User className="w-7 h-7 text-gray-300" />
+                </div>
+              )}
+            </div>
           </div>
 
-          <div className="pt-10 sm:pt-12 pb-3 px-2 sm:px-3 text-center flex-1 flex flex-col">
-            <h2 className="text-xs sm:text-sm font-semibold text-white mb-1 line-clamp-1">
-              {firstName} {lastName}
-            </h2>
-            <div className="mt-1 mb-2 mx-auto w-8 h-0.5 bg-gray-600 rounded-full"></div>
-            <p className="text-xs text-gray-300 line-clamp-2 flex-1">{about || "No details provided"}</p>
+          {/* User Information */}
+          <div className="pt-6 px-4 pb-3 text-center flex-1 flex flex-col justify-center">
+            <h2 className="text-sm font-semibold text-gray-100">{firstName} {lastName}</h2>
+
+            <div className="mt-2 mb-2 mx-auto w-10 h-0.5 bg-gray-700 rounded-full"></div>
+
+         
+<div className="h-10 text-xs text-gray-300 overflow-hidden">
+  {skills?.length > 0 ? (
+    <p className="line-clamp-2 text-center">
+      {skills.slice(0, 6).join(", ")}
+      {skills.length > 6 && " ..."}
+    </p>
+  ) : (
+    <p className="text-gray-400"></p>
+  )}
+</div>
+
+
           </div>
         </div>
 
-        <div className="px-2 pb-2 pt-1 flex justify-between gap-1 sm:gap-2 border-t border-gray-700">
+        {/* Action Buttons - Always Visible */}
+        <div className="px-4 py-2 flex justify-center gap-4 border-t border-gray-800 bg-gray-900">
           <button
             onClick={() => requestSend("ignored")}
-            className="flex-1 bg-gray-700 text-gray-300 hover:bg-gray-600 px-1 py-1.5 rounded-md flex items-center justify-center text-[10px] sm:text-xs font-medium transition-colors duration-200"
+            className="p-2 rounded-md bg-gray-800 hover:bg-gray-700 transition flex items-center justify-center"
             aria-label="Ignore developer"
+            data-tooltip-id={`ignore-tooltip-${_id}`}
           >
-            <UserX size={12} className="mr-1" />
-            Ignore
+            <UserX size={18} className="text-gray-400 hover:text-red-500 transition" />
           </button>
+
           <button
             onClick={() => requestSend("interested")}
-            className="flex-1 bg-blue-600 text-white hover:bg-blue-700 px-1 py-1.5 rounded-md flex items-center justify-center text-[10px] sm:text-xs font-medium transition-colors duration-200"
+            className="p-2 rounded-md bg-gray-800 hover:bg-gray-700 transition flex items-center justify-center"
             aria-label="Show interest in developer"
+            data-tooltip-id={`interested-tooltip-${_id}`}
           >
-            <UserCheck size={12} className="mr-1" />
-            Interested
+            <UserCheck size={18} className="text-gray-400 hover:text-emerald-400 transition" />
           </button>
+
+          {/* Tooltips */}
+          <Tooltip id={`ignore-tooltip-${_id}`} place="top" effect="solid">
+            Ignore
+          </Tooltip>
+          <Tooltip id={`interested-tooltip-${_id}`} place="top" effect="solid">
+            Interested
+          </Tooltip>
         </div>
       </div>
     )
@@ -85,4 +106,3 @@ const FeedCard = ({ feedUser }) => {
 }
 
 export default FeedCard
-
