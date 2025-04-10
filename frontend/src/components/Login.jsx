@@ -14,6 +14,7 @@ const Login = () => {
   const [isLoginForm, setIsLoginForm] = useState(true);
   const [password, setPassword] = useState("Ayat@123");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((store) => store.user);
@@ -23,17 +24,19 @@ const Login = () => {
     }
   }, [user, navigate]);
   const handleLogin = async () => {
+    setLoading(true);
     try {
       const res = await axios.post(BASE_URL + "/login", {
         emailId,
         password,
       }, { withCredentials: true });
       dispatch(addUser(res.data));
-     
-      return navigate("/");
+      navigate("/");
     } catch (err) {
       console.log(err);
       setError(err?.response?.data);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -42,6 +45,7 @@ const Login = () => {
       setError("Password and Confirm Password do not match");
       return;
     }
+    setLoading(true);
     try {
       const res = await axios.post(BASE_URL + "/signup", {
         firstName,
@@ -50,14 +54,16 @@ const Login = () => {
         password,
       }, { withCredentials: true });
       dispatch(addUser(res.data));
-      return navigate("/profile");
+      navigate("/profile");
     } catch (err) {
       console.log(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className={` ${!isLoginForm?"mt-9":"mt-0"} flex justify-center items-center  min-h-screen bg-dark-charcoal p-4 overflow-auto `}>
+    <div className={` ${!isLoginForm ? "mt-9" : "mt-0"} flex justify-center items-center  min-h-screen bg-dark-charcoal p-4 overflow-auto `}>
       <div className="card bg-gray-800 w-full max-w-md shadow-xl rounded-xl">
         <div className="card-body p-6 max-h-[90vh] overflow-y-auto">
           <h2 className="card-title text-2xl font-bold text-soft-white mb-6">{isLoginForm ? "Login" : "Sign Up"}</h2>
@@ -125,8 +131,9 @@ const Login = () => {
             <button
               onClick={isLoginForm ? handleLogin : handleSignUp}
               className="btn bg-vibrant-clay hover:bg-orange-600 text-soft-white w-full"
+              disabled={loading}
             >
-              {isLoginForm ? "Login" : "Sign Up"}
+              {loading ? "Processing..." : isLoginForm ? "Login" : "Sign Up"}
             </button>
           </div>
           <div className="card-actions justify-center mt-4">
