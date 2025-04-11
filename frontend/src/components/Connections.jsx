@@ -69,7 +69,7 @@ const Connections = () => {
         {connections?.data && connections.data.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {connections.data.map((connection) => {
-              const { firstName, lastName, about, photoUrl, _id, skills } = connection
+              const { firstName, lastName, about, photoUrl, _id, skills } = connection;
               
               const skillsArray = Array.isArray(skills) ? skills.slice(0, 2) : [];
 
