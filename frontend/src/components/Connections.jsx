@@ -30,7 +30,7 @@ const Connections = () => {
 
   useEffect(() => {
     if (!connections) getConnections()
-  }, [])
+  }, [connections])
 
   if (!connections) return null
 

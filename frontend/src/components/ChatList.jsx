@@ -3,6 +3,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchConversations } from "../utils/store";
 import { useNavigate } from "react-router-dom";
 import { PlusCircle } from "lucide-react";
+import { addConnections } from "../utils/connectionSlice";
+import axios from "axios";
+import { BASE_URL } from "../utils/constants";
 
 const ChatList = () => {
     const dispatch = useDispatch();
@@ -24,7 +27,19 @@ const ChatList = () => {
             },
         });
     };
-
+      const getConnections = async () => {
+        try {
+          const res = await axios.get(BASE_URL + "/user/connection", {
+            withCredentials: true,
+          })
+          dispatch(addConnections(res?.data))
+        } catch (err) {
+          console.log(err.message)
+        }
+      }
+      useEffect(() => {
+        if (!connections) getConnections()
+      }, [connections])
     return (
         <div className="relative min-h-screen bg-gray-900 p-6">
             {/* Page Title */}
@@ -79,9 +94,9 @@ const ChatList = () => {
             </div>
 
             {/* Floating "Create Group" Button */}
-            {connections && connections?.length>0 && <button
+            {connections && connections?.data?.length>0 && <button
                 onClick={() => navigate("/create-group-chat")}
-                className="fixed bottom-6 right-6 flex items-center mb-14 gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-full shadow-lg transition-all text-sm font-medium"
+                className="fixed bottom-6 right-6 flex items-center mb-16 gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-full shadow-lg transition-all text-sm font-medium"
             >
                 <PlusCircle size={22} />
                 Create Group

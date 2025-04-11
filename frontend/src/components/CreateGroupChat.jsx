@@ -33,7 +33,7 @@ const CreateGroupChat = () => {
     };
 
     useEffect(() => {
-        if (!connections) getConnections();
+        if(!connections)getConnections();
     }, [connections]);
 
     const handleCreateGroup = async () => {

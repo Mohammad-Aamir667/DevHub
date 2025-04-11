@@ -5,6 +5,7 @@ import { useSelector } from "react-redux"
 import { useNavigate } from "react-router-dom"
 import axios from "axios"
 import { BASE_URL } from "../utils/constants"
+import { ArrowLeft } from 'lucide-react';
 
 const EditExpertProfile = () => {
   const expert = useSelector((state) => state.expertDetails)
@@ -52,21 +53,11 @@ const EditExpertProfile = () => {
       <div className="w-full max-w-4xl bg-gray-900 border border-gray-800 rounded-lg shadow-xl text-gray-100">
         {/* Header */}
         <div className="p-6 pb-2 flex items-center justify-between">
-          <button
-            className="text-gray-400 hover:text-gray-100 transition-colors flex items-center space-x-2 text-sm"
+        <button
             onClick={() => navigate(-1)}
+            className="text-slate-400 hover:text-slate-100 hover:bg-slate-800 p-2 sm:p-3 rounded-md flex items-center text-sm sm:text-base transition-colors"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="currentColor"
-              className="w-4 h-4 mr-1"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-            </svg>
-            <span>Back</span>
+            <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 mr-2" /> 
           </button>
           <h1 className="text-2xl font-bold text-gray-100">Edit Profile</h1>
           <div className="w-16" /> {/* Spacer for alignment */}
