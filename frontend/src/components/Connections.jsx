@@ -35,20 +35,21 @@ const Connections = () => {
   if (!connections) return null
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 to-slate-900 pt-16 px-6 py-12">
+    <div className="min-h-screen bg-gradient-to-b mt-12 from-slate-950 to-slate-900 pt-5 px-6 py-12">
       <div className="max-w-4xl mx-auto">
-        {/* Back Button */}
-        <button
-          onClick={() => navigate(-1)}
-          className="text-slate-400 hover:text-slate-100 hover:bg-slate-800 p-2 rounded-md flex items-center text-sm transition-colors mb-8"
-        >
-          <ArrowLeft className="w-6 h-6 mr-2" /> 
-        </button>
+        {/* Header with Back Button */}
+        <div className="mb-8 flex items-center justify-between">
+          <button
+            onClick={() => navigate(-1)}
+            className="text-slate-400 hover:text-slate-100 hover:bg-slate-800 p-2 sm:p-3 rounded-md flex items-center text-sm sm:text-base transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 mr-2" /> 
+          </button>
 
-        {/* Header */}
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-slate-100 mb-2">Your Connections</h1>
-          <p className="text-slate-400">Connect with other developers in your network</p>
+          <div className="text-center flex-1">
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-100">Your Connections</h1>
+            <p className="text-slate-400">Connect with other developers in your network</p>
+          </div>
         </div>
 
         {/* Empty State */}
@@ -70,10 +71,8 @@ const Connections = () => {
             {connections.data.map((connection) => {
               const { firstName, lastName, about, photoUrl, _id, skills } = connection
               
-              // Parse skills if it's a string
-              const skillsArray = typeof skills === 'string' 
-                ? skills.split(',').map(skill => skill.trim()).slice(0, 2) 
-                : Array.isArray(skills) ? skills.slice(0, 2) : []
+              const skillsArray = Array.isArray(skills) ? skills.slice(0, 2) : [];
+
               
               return (
                 <div
@@ -110,7 +109,7 @@ const Connections = () => {
                                 {skill}
                               </span>
                             ))}
-                            {(Array.isArray(skills) ? skills.length : skills?.split(',').length) > 2 && (
+                            { skills?.length >  2 && (
                               <span className="text-slate-400 text-xs">+more</span>
                             )}
                           </div>

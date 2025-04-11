@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom"
 import { BASE_URL } from "../utils/constants"
 import { removeUser } from "../utils/userSlice"
 import axios from "axios"
+import { useState, useEffect, useRef } from "react"
 
 import { clearFeed } from "../utils/feedSlice"
 import { clearExpertData } from "../utils/expertDetailsSlice"
@@ -12,7 +13,6 @@ import { removeConnections } from "../utils/connectionSlice"
 import { removeConversations } from "../utils/conversationsSlice"
 import { removeExpertFeed } from "../utils/expertFeedSlice"
 
-
 const NavBar = () => {
   const user = useSelector((store) => store.user)
   const dispatch = useDispatch()
@@ -21,16 +21,19 @@ const NavBar = () => {
   const notifications = useSelector((store) => store.notifications || [])
   const unreadCount = notifications.filter((n) => !n.read).length
 
+  const [dropdownOpen, setDropdownOpen] = useState(false)
+  const dropdownRef = useRef(null) // Reference for dropdown
+
   const handleLogout = async () => {
     try {
       await axios.post(BASE_URL + "/logout", {}, { withCredentials: true })
       dispatch(removeUser())
       dispatch(clearFeed())
-      dispatch(clearExpertData());
+      dispatch(clearExpertData())
       dispatch(removeExpertFeed())
-      dispatch(removeExpertInteraction());
-      dispatch(removeConnections());
-      dispatch(removeConversations());
+      dispatch(removeExpertInteraction())
+      dispatch(removeConnections())
+      dispatch(removeConversations())
 
       return navigate("/login")
     } catch (err) {
@@ -38,7 +41,20 @@ const NavBar = () => {
       alert("Something went wrong")
     }
   }
-   
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [])
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-30 bg-gray-900 text-gray-100 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -59,8 +75,12 @@ const NavBar = () => {
                   </span>
                 )}
               </Link>
-              <div className="relative group">
-                <button className="flex items-center space-x-2 focus:outline-none">
+              {/* Dropdown Button & Menu */}
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  className="flex items-center space-x-2 focus:outline-none"
+                >
                   <img
                     src={user?.photoUrl || "/placeholder.svg"}
                     alt="User Avatar"
@@ -68,36 +88,38 @@ const NavBar = () => {
                   />
                   <span className="hidden md:inline-block">{user?.name}</span>
                 </button>
-                <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md overflow-hidden shadow-xl z-10 hidden group-hover:block">
-                  <Link to="/profile" className="block px-4 py-2 text-sm hover:bg-gray-700 transition-colors">
-                    Profile
-                  </Link>
-                  <Link to="/requests" className="block px-4 py-2 text-sm hover:bg-gray-700 transition-colors">
-                    Requests
-                  </Link>
-                  {!expertDetails?.expertId && expertDetails?.status !== "approved" && (
-                    <Link
-                      to="/expert-application-form"
-                      className="block px-4 py-2 text-sm hover:bg-gray-700 transition-colors"
-                    >
-                      Apply for Expert
+                {dropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md overflow-hidden shadow-xl z-10">
+                    <Link to="/profile" className="block px-4 py-2 text-sm hover:bg-gray-700 transition-colors">
+                      Profile
                     </Link>
-                  )}
-                  {expertDetails?.expertId && expertDetails?.status === "approved" && (
-                    <Link
-                      to="/expert-dashboard"
-                      className="block px-4 py-2 text-sm hover:bg-gray-700 transition-colors"
-                    >
-                      Expert Dashboard
+                    <Link to="/requests" className="block px-4 py-2 text-sm hover:bg-gray-700 transition-colors">
+                      Requests
                     </Link>
-                  )}
-                  <button
-                    onClick={handleLogout}
-                    className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-700 transition-colors"
-                  >
-                    Logout
-                  </button>
-                </div>
+                    {!expertDetails?.expertId && expertDetails?.status !== "approved" && (
+                      <Link
+                        to="/expert-application-form"
+                        className="block px-4 py-2 text-sm hover:bg-gray-700 transition-colors"
+                      >
+                        Apply for Expert
+                      </Link>
+                    )}
+                    {expertDetails?.expertId && expertDetails?.status === "approved" && (
+                      <Link
+                        to="/expert-dashboard"
+                        className="block px-4 py-2 text-sm hover:bg-gray-700 transition-colors"
+                      >
+                        Expert Dashboard
+                      </Link>
+                    )}
+                    <button
+                      onClick={handleLogout}
+                      className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-700 transition-colors"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -108,4 +130,3 @@ const NavBar = () => {
 }
 
 export default NavBar
-

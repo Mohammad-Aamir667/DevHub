@@ -20,12 +20,11 @@ const ViewProfile = () => {
         <div className="bg-slate-900 rounded-lg shadow-xl overflow-hidden border border-slate-800">
           {/* Profile Header */}
           <button
-          onClick={() => navigate(-1)}
-          className="flex items-center text-slate-400 hover:text-slate-300 p-3 font-medium mb-6 transition duration-200"
-        >
-          <ArrowLeft className="w-6 h-7 mr-2"  />
-        
-        </button>
+                     onClick={() => navigate(-1)}
+                     className="text-slate-400 hover:text-slate-100 hover:bg-slate-800 p-2 sm:p-3 rounded-md flex items-center text-sm sm:text-base transition-colors"
+                   >
+                     <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 mr-2" /> 
+                   </button>
           <div className="relative h-48 bg-gradient-to-r from-slate-800 to-slate-900">
             <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2">
               <div className="w-32 h-32 rounded-full border-4 border-slate-900 shadow-lg overflow-hidden">

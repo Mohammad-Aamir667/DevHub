@@ -5,6 +5,7 @@ import { io } from 'socket.io-client';
 import { BASE_URL } from '../utils/constants';
 import axios from 'axios';
 import RenderFiles from './RenderFiles';
+import { ArrowLeft } from "lucide-react"
 
 const socket = io(BASE_URL);
 
@@ -133,11 +134,12 @@ const Chat = () => {
   return (
     <div className="flex flex-col h-screen w-full bg-dark-charcoal shadow-lg rounded-lg overflow-hidden">
       <div className="flex items-center p-4 bg-gray-800 text-soft-white">
-        <button onClick={() => navigate(-1)} className="mr-4 text-electric-blue hover:text-cyan-400 transition duration-200">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-        </button>
+      <button
+            onClick={() => navigate(-1)}
+            className="text-slate-400 hover:text-slate-100 hover:bg-slate-800 p-2 sm:p-3 rounded-md flex items-center text-sm sm:text-base transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 mr-2" /> 
+          </button>
         <img src={photoUrl || "/placeholder.svg"} alt="user" className="w-10 h-10 rounded-full mr-3" />
         <span className="font-semibold text-lg">{groupChat ? conversationName : `${firstName} ${lastName}`}</span>
       </div>
