@@ -8,6 +8,10 @@ import { clearFeed } from "../utils/feedSlice"
 import { clearExpertData } from "../utils/expertDetailsSlice"
 import { Code, Bell } from "lucide-react"
 import { removeExpertInteraction } from "../utils/expertInteractionslice"
+import { removeConnections } from "../utils/connectionSlice"
+import { removeConversations } from "../utils/conversationsSlice"
+import { removeExpertFeed } from "../utils/expertFeedSlice"
+
 
 const NavBar = () => {
   const user = useSelector((store) => store.user)
@@ -23,7 +27,11 @@ const NavBar = () => {
       dispatch(removeUser())
       dispatch(clearFeed())
       dispatch(clearExpertData());
-      removeExpertInteraction();
+      dispatch(removeExpertFeed())
+      dispatch(removeExpertInteraction());
+      dispatch(removeConnections());
+      dispatch(removeConversations());
+
       return navigate("/login")
     } catch (err) {
       console.error(err)

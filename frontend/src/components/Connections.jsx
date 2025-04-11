@@ -1,105 +1,143 @@
-import axios from "axios";
-import React, { useEffect } from "react";
-import { BASE_URL } from "../utils/constants";
-import { useDispatch, useSelector } from "react-redux";
-import { addConnections } from "../utils/connectionSlice";
-import { useNavigate } from "react-router-dom";
+"use client"
+
+import axios from "axios"
+import React, { useEffect } from "react"
+import { BASE_URL } from "../utils/constants"
+import { useDispatch, useSelector } from "react-redux"
+import { addConnections } from "../utils/connectionSlice"
+import { useNavigate } from "react-router-dom"
+import { ArrowLeft, UserCircle, ExternalLink } from 'lucide-react'
 
 const Connections = () => {
-  const connections = useSelector((store) => store.connections);
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const connections = useSelector((store) => store.connections)
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   const viewProfile = (connection) => {
-    navigate(`/view-profile`, { state: { userProfile: connection } });
-  };
+    navigate(`/view-profile`, { state: { userProfile: connection } })
+  }
 
   const getConnections = async () => {
     try {
       const res = await axios.get(BASE_URL + "/user/connection", {
         withCredentials: true,
-      });
-      dispatch(addConnections(res?.data));
+      })
+      dispatch(addConnections(res?.data))
     } catch (err) {
-      console.log(err.message);
+      console.log(err.message)
     }
-  };
+  }
 
   useEffect(() => {
-    if(!connections)
-    getConnections();
-  }, []);
+    if (!connections) getConnections()
+  }, [])
 
-  if (!connections) return null;
-  if (connections?.length === 0)
-    return (
-      <div className="text-center text-light-gray text-lg mt-10">
-        No Connection found!
-      </div>
-    );
+  if (!connections) return null
 
   return (
-    <div className="min-h-screen bg-gray-900  p-6 flex flex-col items-center">
-      {/* Back Button */}
-      <div className="w-full max-w-3xl flex items-center mb-6">
+    <div className="min-h-screen bg-gradient-to-b from-slate-950 to-slate-900 pt-16 px-6 py-12">
+      <div className="max-w-4xl mx-auto">
+        {/* Back Button */}
         <button
           onClick={() => navigate(-1)}
-          className="text-electric-blue hover:text-cyan-400 transition duration-200 flex items-center space-x-2"
+          className="text-slate-400 hover:text-slate-100 hover:bg-slate-800 p-2 rounded-md flex items-center text-sm transition-colors mb-8"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={2}
-            stroke="currentColor"
-            className="w-5 h-5"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-          </svg>
-          <span>Back</span>
+          <ArrowLeft className="w-6 h-6 mr-2" /> 
         </button>
-      </div>
 
-      {/* Header */}
-      <h1 className="text-2xl font-semibold text-soft-white mb-6">Connections</h1>
+        {/* Header */}
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-bold text-slate-100 mb-2">Your Connections</h1>
+          <p className="text-slate-400">Connect with other developers in your network</p>
+        </div>
 
-      {/* Connection Cards */}
-      <div className="w-full max-w-4xl grid grid-cols-1 sm:grid-cols-2 gap-6">
-        {connections.data.map((connection) => {
-          const { firstName, lastName, about, photoUrl, _id } = connection;
-          return (
-            <div
-              key={_id}
-              className="bg-gray-800 shadow-lg rounded-xl p-5 flex items-center space-x-4 transition-all duration-300 hover:shadow-xl hover:scale-[1.02]"
-            >
-              {/* Profile Image */}
-              <img
-                src={photoUrl}
-                alt={firstName}
-                className="w-16 h-16 rounded-full border-2 border-electric-blue object-cover"
-              />
-
-              {/* User Info */}
-              <div className="flex-1">
-                <h2 className="text-lg font-semibold text-soft-white">
-                  {firstName} {lastName}
-                </h2>
-                <p className="text-sm text-gray-400">{about}</p>
-              </div>
-
-              {/* View Profile Button */}
-              <button
-                onClick={() => viewProfile(connection)}
-                className="bg-blue-500 hover:to-blue-600 text-soft-white px-4 py-2 rounded-lg text-sm font-medium transition-all"
-              >
-                View Profile
-              </button>
+        {/* Empty State */}
+        {connections?.length === 0 && (
+          <div className="bg-slate-800 border border-slate-700 rounded-xl p-10 text-center">
+            <div className="flex justify-center mb-4">
+              <UserCircle className="h-16 w-16 text-slate-600" />
             </div>
-          );
-        })}
+            <h3 className="text-xl font-semibold text-slate-300 mb-2">No Connections Found</h3>
+            <p className="text-slate-400 mb-6 max-w-md mx-auto">
+              You haven't connected with any developers yet. Start building your network to collaborate on projects.
+            </p>
+          </div>
+        )}
+
+        {/* Connection Cards */}
+        {connections?.data && connections.data.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {connections.data.map((connection) => {
+              const { firstName, lastName, about, photoUrl, _id, skills } = connection
+              
+              // Parse skills if it's a string
+              const skillsArray = typeof skills === 'string' 
+                ? skills.split(',').map(skill => skill.trim()).slice(0, 2) 
+                : Array.isArray(skills) ? skills.slice(0, 2) : []
+              
+              return (
+                <div
+                  key={_id}
+                  className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-slate-600 group"
+                >
+                  <div className="h-2 bg-gradient-to-r from-cyan-500 to-blue-600"></div>
+                  <div className="p-5">
+                    <div className="flex items-start gap-4">
+                      {/* Profile Image */}
+                      <div className="relative">
+                        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 opacity-70 animate-pulse"></div>
+                        <img
+                          src={photoUrl || "/placeholder.svg"}
+                          alt={`${firstName} ${lastName}`}
+                          className="w-16 h-16 rounded-full border-2 border-slate-700 object-cover relative z-10"
+                        />
+                      </div>
+
+                      {/* User Info */}
+                      <div className="flex-1">
+                        <h2 className="text-lg font-semibold text-slate-100">
+                          {firstName} {lastName}
+                        </h2>
+                        
+                        {/* Skills */}
+                        {skillsArray && skillsArray.length > 0 && (
+                          <div className="flex flex-wrap gap-2 mt-1 mb-2">
+                            {skillsArray.map((skill, index) => (
+                              <span
+                                key={index}
+                                className="bg-slate-700 text-cyan-300 px-2 py-0.5 rounded-md text-xs font-medium"
+                              >
+                                {skill}
+                              </span>
+                            ))}
+                            {(Array.isArray(skills) ? skills.length : skills?.split(',').length) > 2 && (
+                              <span className="text-slate-400 text-xs">+more</span>
+                            )}
+                          </div>
+                        )}
+                        
+                        <p className="text-sm text-slate-400 line-clamp-2">{about || "No bio available"}</p>
+                      </div>
+                    </div>
+
+                    {/* View Profile Button */}
+                    <div className="mt-4 flex justify-end">
+                      <button
+                        onClick={() => viewProfile(connection)}
+                        className="bg-slate-700 hover:bg-slate-600 text-slate-200 px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center group-hover:bg-gradient-to-r group-hover:from-cyan-500 group-hover:to-blue-600 group-hover:text-white"
+                      >
+                        View Profile <ExternalLink className="w-3.5 h-3.5 ml-2" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Connections;
+export default Connections

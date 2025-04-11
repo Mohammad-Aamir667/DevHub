@@ -21,7 +21,7 @@ const ViewProfile = () => {
           {/* Profile Header */}
           <button
           onClick={() => navigate(-1)}
-          className="flex items-center text-slate-400 hover:text-slate-300 font-medium mb-6 transition duration-200"
+          className="flex items-center text-slate-400 hover:text-slate-300 p-3 font-medium mb-6 transition duration-200"
         >
           <ArrowLeft className="w-6 h-7 mr-2"  />
         
@@ -78,25 +78,7 @@ const ViewProfile = () => {
               </div>
             )}
 
-            {/* Personal Info */}
-            {(age || gender) && (
-              <div className="grid grid-cols-2 gap-4 mb-6 text-slate-300 max-w-md mx-auto">
-                {age && (
-                  <div className="flex items-center justify-center bg-slate-800/50 rounded-lg p-3">
-                    <Calendar className="w-4 h-4 text-slate-400 mr-2" />
-                    <span className="text-sm">{age} years old</span>
-                  </div>
-                )}
-                {gender && (
-                  <div className="flex items-center justify-center bg-slate-800/50 rounded-lg p-3">
-                    <User className="w-4 h-4 text-slate-400 mr-2" />
-                    <span className="text-sm">{gender}</span>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* About Section */}
+            
             {about && (
               <div className="mb-8 bg-slate-800/30 rounded-lg p-5 border border-slate-800/50">
                 <h3 className="text-lg font-semibold text-slate-200 mb-3">About</h3>

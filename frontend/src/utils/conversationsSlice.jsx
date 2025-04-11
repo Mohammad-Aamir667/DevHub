@@ -18,8 +18,9 @@ const conversationsSlice = createSlice({
         },
         addConversation:(state,action)=>{
             state.push(action.payload);
-        }
+        },
+        removeConversations:()=>null,
     }
 });
-export const {setConversations,updateConversations,addConversation} = conversationsSlice.actions;
+export const {setConversations,updateConversations,addConversation,removeConversations} = conversationsSlice.actions;
 export default conversationsSlice.reducer;
