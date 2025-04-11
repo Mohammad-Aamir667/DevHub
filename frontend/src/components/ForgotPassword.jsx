@@ -21,6 +21,10 @@ const ForgotPassword = () => {
   }, [showToast]);
 
   const handleRequestOtp = async () => {
+    if(emailId.trim()=== "") {
+      setError("Email ID is required");
+      return;
+    }
     setLoading(true);
     try {
       const res = await axios.post(
@@ -44,13 +48,12 @@ const ForgotPassword = () => {
     <div className="flex justify-center items-center min-h-screen bg-dark-charcoal p-4 overflow-auto">
       <div className="bg-gray-800 shadow-lg rounded-xl p-6 w-full max-w-md text-soft-white">
         {/* Back Button */}
-        <button
-          onClick={() => navigate(-1)}
-          className="flex items-center text-slate-400 hover:text-slate-300 font-medium mb-6 transition duration-200"
-        >
-          <ArrowLeft className="w-6 h-7 mr-2"  />
-        
-        </button>
+         <button
+                   onClick={() => navigate(-1)}
+                   className="text-slate-400 hover:text-slate-100 hover:bg-slate-800 p-2 sm:p-3 rounded-md flex items-center text-sm sm:text-base transition-colors"
+                 >
+                   <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 mr-2" /> 
+                 </button>
 
         <h2 className="text-2xl font-semibold text-center mb-6">Forgot Password</h2>
 

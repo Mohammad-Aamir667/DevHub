@@ -150,12 +150,12 @@ const ExpertApplicationForm = () => {
           <div className="h-2 bg-gradient-to-r from-cyan-500 to-blue-600"></div>
 
           <div className="p-6">
-          <button
-  onClick={() => navigate(-1)}
-  className="text-slate-400 hover:text-slate-100 hover:bg-slate-700 p-2 sm:p-3 md:p-4 rounded-md inline-flex items-center text-xs sm:text-sm md:text-base transition-colors mb-4"
->
-  <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 mr-2" />
-</button>
+     <button
+               onClick={() => navigate(-1)}
+               className="text-slate-400 hover:text-slate-100 hover:bg-slate-800 p-2 sm:p-3 rounded-md flex items-center text-sm sm:text-base transition-colors"
+             >
+               <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 mr-2" /> 
+             </button>
 
 
             <div className="mb-8 text-center">

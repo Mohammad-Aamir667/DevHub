@@ -97,7 +97,7 @@ const Login = () => {
               type="text"
               value={emailId}
               onChange={(e) => setEmailId(e.target.value)}
-              placeholder="Enter your emailId"
+              placeholder="Enter your email"
               className="input input-bordered w-full bg-gray-700 text-soft-white"
             />
           </label>

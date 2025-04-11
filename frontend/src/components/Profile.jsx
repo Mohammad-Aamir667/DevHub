@@ -20,11 +20,12 @@ const Profile = () => {
       <div className="min-h-screen mt-2 pt-16 bg-gradient-to-b from-slate-950 to-slate-900 py-12 px-6 flex justify-center">
         <div className="max-w-3xl w-full bg-slate-900 border border-slate-800 rounded-xl shadow-xl relative">
         <button
-          onClick={() => navigate(-1)}
-          className="absolute top-4 left-4 text-slate-400 hover:text-slate-100 hover:bg-slate-800 p-1 rounded-md flex items-center text-sm transition-colors"
-        >
-          <ArrowLeft className="w-6 h-6 mr-2" /> 
-        </button>
+                   onClick={() => navigate(-1)}
+                   className="text-slate-400 hover:text-slate-100 hover:bg-slate-800 p-2 sm:p-3 rounded-md flex items-center text-sm sm:text-base transition-colors"
+                 >
+                   <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 mr-2" /> 
+                 </button>
+       
 
           <div className="flex flex-col items-center pt-12 pb-6">
             <div className="relative w-32 h-32 mb-4">

@@ -35,7 +35,7 @@ const Connections = () => {
   if (!connections) return null
 
   return (
-    <div className="min-h-screen bg-gradient-to-b mt-12 from-slate-950 to-slate-900 pt-5 px-6 py-12">
+    <div className="min-h-screen bg-gradient-to-b mt-14 from-slate-950 to-slate-900 pt-5 px-6 py-12">
       <div className="max-w-4xl mx-auto">
         {/* Header with Back Button */}
         <div className="mb-8 flex items-center justify-between">
