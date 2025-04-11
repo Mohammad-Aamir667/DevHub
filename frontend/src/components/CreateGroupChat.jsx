@@ -50,12 +50,15 @@ const CreateGroupChat = () => {
     return  (
      
         <div className="min-h-screen flex items-center -mt-10 justify-center bg-gray-900 text-white p-6">
-              {connections && connections?.length>0 ?(
+              {connections && connections?.data?.length>0 ?(
             <div className="max-w-3xl w-full bg-gray-800 p-6 rounded-xl shadow-lg relative">
                 {/* Back Button */}
-                <button onClick={() => navigate(-1)} className="absolute top-4 left-4 text-gray-400 hover:text-white transition">
-                    <ArrowLeft size={24} />
-                </button>
+                <button
+                           onClick={() => navigate(-1)}
+                           className="text-slate-400 hover:text-slate-100 hover:bg-slate-800 p-2 sm:p-3 rounded-md flex items-center text-sm sm:text-base transition-colors"
+                         >
+                           <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 mr-2" /> 
+                         </button>
 
                 <h1 className="text-2xl font-bold text-center mb-6 border-b border-gray-700 pb-3">Create Group Chat</h1>
                 
