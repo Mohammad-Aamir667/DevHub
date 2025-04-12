@@ -70,7 +70,6 @@ const Connections = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {connections.data.map((connection) => {
               const { firstName, lastName, about, photoUrl, _id, skills } = connection;
-              
               const skillsArray = Array.isArray(skills) ? skills.slice(0, 2) : [];
 
               
@@ -98,24 +97,29 @@ const Connections = () => {
                           {firstName} {lastName}
                         </h2>
                         
-                        {/* Skills */}
                         {skillsArray && skillsArray.length > 0 && (
-                          <div className="flex flex-wrap gap-2 mt-1 mb-2">
-                            {skillsArray.map((skill, index) => (
-                              <span
-                                key={index}
-                                className="bg-slate-700 text-cyan-300 px-2 py-0.5 rounded-md text-xs font-medium"
-                              >
-                                {skill}
-                              </span>
-                            ))}
-                            { skills?.length >  2 && (
-                              <span className="text-slate-400 text-xs">+more</span>
-                            )}
-                          </div>
-                        )}
-                        
-                        <p className="text-sm text-slate-400 line-clamp-2">{about || "No bio available"}</p>
+    <div className="flex flex-wrap gap-2 mt-1 mb-2 max-w-full">
+      {skillsArray.map((skill, index) => (
+        <span
+          key={index}
+          className="bg-slate-700 text-cyan-300 px-2 py-0.5 rounded-md text-xs sm:text-sm font-medium truncate max-w-[120px] sm:max-w-[150px]"
+        >
+          {skill}
+        </span>
+      ))}
+      {skills?.length > 2 && (
+        <span className="text-slate-400 text-xs sm:text-sm">+more</span>
+      )}
+    </div>
+  )}
+
+  {/* About */}
+  <p className="text-xs sm:text-sm text-slate-400 break-words max-w-full">
+    {about?.length > 50
+      ? about.slice(0, 50) + "..."
+      : about || "No bio available"}
+  </p>
+
                       </div>
                     </div>
 
