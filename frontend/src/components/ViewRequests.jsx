@@ -92,7 +92,7 @@ const ViewRequests = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 to-slate-900 pt-16 px-4 sm:px-6 py-12">
+    <div className="min-h-screen bg-gradient-to-b mt-2 from-slate-950 to-slate-900 pt-16 px-4 sm:px-6 py-12">
       <div className="max-w-7xl mx-auto">
         {/* Header with back button */}
         <div className="flex items-center justify-between mb-8">

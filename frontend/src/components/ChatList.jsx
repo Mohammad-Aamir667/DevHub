@@ -12,11 +12,10 @@ import { BASE_URL } from "../utils/constants"
 const ChatList = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const conversations = useSelector((state) => state.conversations)
+  const conversations = useSelector((state) => state.conversations);
   const user = useSelector((state) => state.user)
   const loggedInUser = user?._id
   const connections = useSelector((state) => state.connections)
-
   useEffect(() => {
     dispatch(fetchConversations())
   }, [dispatch])
@@ -45,11 +44,16 @@ const ChatList = () => {
   useEffect(() => {
     if (!connections) getConnections()
   }, [connections])
-
+  const sortedConversations = [...conversations].sort((a, b) => {
+    const timeA = new Date(a.lastMessage?.timestamp || 0).getTime();
+    const timeB = new Date(b.lastMessage?.timestamp || 0).getTime();
+    return timeB - timeA; // Newest first
+  });
+  
   // Format timestamp to a more readable format
   const formatTimestamp = (timestamp) => {
     if (!timestamp) return ""
-    
+  
     const date = new Date(timestamp)
     const now = new Date()
     const isToday = date.toDateString() === now.toDateString()
@@ -78,18 +82,17 @@ const ChatList = () => {
 
         {/* Chat List */}
         <div className="space-y-3">
-          {conversations?.length > 0 ? (
-            conversations.map((convo) => {
+          {sortedConversations?.length > 0 ? (
+            sortedConversations.map((convo) => {
+            
               const isGroupChat = convo.conversationType === "group"
               const otherParticipant = convo.participants.find((p) => p._id !== loggedInUser)
-
               return (
                 <div
                   key={convo._id}
                   onClick={() => messageUser(convo)}
                   className="flex items-center gap-4 p-4 bg-slate-800 border border-slate-700 rounded-xl hover:bg-slate-700 cursor-pointer transition-all shadow-md hover:shadow-lg"
                 >
-                  {/* Avatar with online indicator */}
                   <div className="relative flex-shrink-0">
                     {!isGroupChat && otherParticipant ? (
                       <img
@@ -104,7 +107,7 @@ const ChatList = () => {
                     )}
                   </div>
 
-                  {/* Chat Details */}
+                  
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between items-start">
                       <h4 className="text-base font-semibold text-slate-100 truncate">
@@ -118,7 +121,8 @@ const ChatList = () => {
                     </div>
                     <p className="text-slate-400 text-sm truncate mt-1">
                       {convo.lastMessage?.messageText || 
-                       (convo.lastMessage?.fileUrl ? "Sent an attachment" : "No messages yet")}
+                       (convo.lastMessage?.fileUrl ? "Sent an attachment" : "No messages yet")
+                       }
                     </p>
                   </div>
                 </div>

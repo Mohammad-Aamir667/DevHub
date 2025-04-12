@@ -7,7 +7,7 @@ import { io } from "socket.io-client"
 import { BASE_URL } from "../utils/constants"
 import axios from "axios"
 import RenderFiles from "./RenderFiles"
-import { ArrowLeft, Paperclip, Send, User } from "lucide-react"
+import { ArrowLeft, Paperclip, Send, User, Loader2 } from "lucide-react"
 
 const socket = io(BASE_URL)
 
@@ -16,7 +16,8 @@ const Chat = () => {
   const [messageText, setMessageText] = useState("")
   const [fileUrl, setFileUrl] = useState("")
   const location = useLocation()
-  const [chatHistory, setChatHistory] = useState([])
+  const [chatHistory, setChatHistory] = useState([]);
+  const [isSendingFile, setIsSendingFile] = useState(false);
   const chatContainerRef = useRef(null)
   const inputRef = useRef(null)
 
@@ -79,6 +80,7 @@ const Chat = () => {
 
   const handleFileUpload = async () => {
     if (!file) return
+    setIsSendingFile(true);
     const formData = new FormData()
     formData.append("file", file)
 
@@ -103,6 +105,11 @@ const Chat = () => {
       setFile(null)
     } catch (err) {
       console.log(err.message)
+    }
+    finally{
+      setIsSendingFile(false);
+      setFileUrl("");
+      setFile(null);
     }
   }
 
@@ -153,7 +160,6 @@ const Chat = () => {
     }
   }
 
-  // Group messages by date
   const groupMessagesByDate = () => {
     const groups = {}
 
@@ -170,7 +176,6 @@ const Chat = () => {
 
   const messageGroups = groupMessagesByDate()
 
-  // Handle keyboard submit
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault()
@@ -209,7 +214,6 @@ const Chat = () => {
 
         <div className="ml-3 flex-1">
           <h3 className="font-semibold text-slate-100">{groupChat ? conversationName : `${firstName} ${lastName}`}</h3>
-     {/* <p className="text-xs text-slate-400">{groupChat ? "Group Chat" : "Online"}</p> */}
         </div>
       </div>
 
@@ -217,7 +221,7 @@ const Chat = () => {
       <div
         ref={chatContainerRef}
         className="flex-grow overflow-y-auto p-4 space-y-6"
-        style={{ paddingBottom: "80px" }} // Extra padding to ensure messages aren't hidden behind input on mobile
+        style={{ paddingBottom: "80px" }}
       >
         {Object.entries(messageGroups).map(([date, messages]) => (
           <div key={date} className="space-y-3">
@@ -230,7 +234,6 @@ const Chat = () => {
 
               return (
                 <div key={index} className={`flex ${isSender ? "justify-end" : "justify-start"}`}>
-                  {/* Avatar for receiver messages */}
                   {!isSender && groupChat && (
                     <div className="flex-shrink-0 mr-2">
                       <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-slate-300 text-xs font-bold">
@@ -243,27 +246,23 @@ const Chat = () => {
                     className={`max-w-[75%] rounded-2xl px-4 py-2 ${
                       isSender
                         ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-tr-none"
-                        : "bg-slate-800 border border-slate-700 text-slate-200 rounded-tl-none"
+                        : "bg-slate-800 border border-slate-700/50 text-slate-200 rounded-tl-none"
                     }`}
                   >
-                    {/* Sender name for group chats */}
                     {!isSender && groupChat && (
                       <p className="text-xs font-medium mb-1 text-cyan-300">
                         {msg.fromUserId.firstName} {msg.fromUserId.lastName}
                       </p>
                     )}
 
-                    {/* Message content */}
                     {msg.messageText && <p className="whitespace-pre-wrap break-words">{msg.messageText}</p>}
 
-                    {/* File attachments */}
                     {msg.fileUrl && (
                       <div className="mt-1 mb-1">
                         <RenderFiles fileUrl={msg.fileUrl} />
                       </div>
                     )}
 
-                    {/* Timestamp */}
                     <p className={`text-xs ${isSender ? "text-blue-100" : "text-slate-400"} text-right mt-1`}>
                       {formatTime(msg.timestamp)}
                     </p>
@@ -278,43 +277,50 @@ const Chat = () => {
       {/* Chat Input */}
       <div className="p-3 bg-slate-800 border-t border-slate-700 sticky bottom-0 left-0 right-0">
         <div className="flex items-center gap-2 max-w-4xl mx-auto">
-          {/* File attachment button */}
           <label
             htmlFor="fileInput"
-            className="p-2 text-slate-400 hover:text-cyan-400 hover:bg-slate-700 rounded-full cursor-pointer transition-colors"
+            className="p-2 text-slate-400 hover:text-cyan-400 hover:bg-slate-700 rounded-full cursor-pointer transition-colors flex-shrink-0"
           >
             <Paperclip className="w-5 h-5" />
           </label>
           <input type="file" id="fileInput" className="hidden" onChange={handleFileChange} />
 
-          {/* Selected file indicator */}
           {file && (
-            <div className="bg-slate-700 text-slate-300 text-xs px-2 py-1 rounded-md flex items-center">
-              <span className="truncate max-w-[100px]">{file.name}</span>
-              <button onClick={() => setFile(null)} className="ml-1 text-slate-400 hover:text-slate-200">
-                ✕
-              </button>
+            <div className="flex items-center gap-2 overflow-hidden">
+              <div className="bg-slate-700 text-slate-300 text-xs px-2 py-1 rounded-md flex items-center max-w-[120px] sm:max-w-[200px] truncate">
+                {file.name}
+                <button 
+                  onClick={() => setFile(null)} 
+                  className="ml-1 text-slate-400 hover:text-slate-200 flex-shrink-0"
+                >
+                  ✕
+                </button>
+              </div>
             </div>
           )}
 
-          {/* Message input */}
-          <input
+         {!file && <input
             ref={inputRef}
             type="text"
             value={messageText}
+            disabled = {file}
             onChange={(e) => setMessageText(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type your message..."
-            className="flex-grow bg-slate-700 text-slate-200 rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-cyan-500"
-          />
+            className="flex-grow bg-slate-700 text-slate-200 rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-cyan-500 min-w-0"
+          />}
 
-          {/* Send button */}
           {(messageText.trim() || file) && (
             <button
               onClick={file ? handleFileUpload : handleSendMessage}
-              className="p-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white rounded-full transition-colors"
+              disabled={isSendingFile}
+              className="p-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white rounded-full transition-colors flex-shrink-0 disabled:opacity-70"
             >
-              <Send className="w-5 h-5" />
+              {isSendingFile ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <Send className="w-5 h-5" />
+              )}
             </button>
           )}
         </div>

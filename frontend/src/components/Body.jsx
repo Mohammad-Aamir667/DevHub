@@ -62,7 +62,7 @@ useEffect(()=>{
   return (
     <div>
      { !shouldTopHideNavBar && <NavBar/>}
-     <div className="flex-1 pb-20"> 
+     <div className={`flex-1 ${!shouldBotHideNavBar?"pb-14":""}`}> 
         <Outlet />
       </div>
    {!shouldBotHideNavBar && <BottomNavigation/>}
