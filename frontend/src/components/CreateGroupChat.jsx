@@ -66,7 +66,7 @@ const CreateGroupChat = () => {
   })
 
   return (
-    <div className={`min-h-screen bg-gradient-to-b ${selectedParticipants? "mt-4":"-mt-16"} from-slate-950 to-slate-900 pt-16 px-4 sm:px-6 py-12 flex items-center justify-center`}>
+    <div className={`min-h-screen bg-gradient-to-b mt-6 from-slate-950 to-slate-900 pt-16 px-4 sm:px-6 py-12 flex justify-center `}>
       {connections && connections?.data?.length > 0 ? (
         <div className="max-w-2xl w-full bg-slate-800 border border-slate-700 rounded-xl shadow-xl overflow-hidden">
           <div className="h-2 bg-gradient-to-r from-cyan-500 to-blue-600"></div>

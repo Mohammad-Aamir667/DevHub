@@ -1,4 +1,4 @@
-
+"use client"
 
 import { Star, Clock, Calendar, ExternalLink } from "lucide-react"
 import { Link } from "react-router-dom"

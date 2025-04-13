@@ -1,53 +1,199 @@
 "use client"
 
-import { useState } from "react"
-import { useSelector } from "react-redux"
+import { useEffect, useState } from "react"
+import { useDispatch, useSelector } from "react-redux"
 import { useNavigate } from "react-router-dom"
 import axios from "axios"
 import { BASE_URL } from "../utils/constants"
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, FileText, Upload } from 'lucide-react';
+import {  updateExpertStatus } from "../utils/expertDetailsSlice"
 
 const EditExpertProfile = () => {
-  const expert = useSelector((state) => state.expertDetails)
+  const expert = useSelector((state) => state.expertDetails);
+  console.log(expert);
   const user = useSelector((state) => state.user)
   const navigate = useNavigate()
 
   const [profileData, setProfileData] = useState({
-    expertise: expert.expertise || "",
+    expertise: expert.expertise?.join(", ") || "",
     experienceYears: expert.experienceYears || "",
     description: expert.description || "",
     certifications: expert.certifications?.join(", ") || "",
     linkedInProfile: expert.linkedInProfile || "",
+    resumeUrl:  "",
+    portfolioUrl: expert.portfolioUrl || "",
     githubProfile: expert.githubProfile || "",
     languages: expert.languages?.join(", ") || "",
-    country: expert.country || "",
-    city: expert.city || "",
-    postalCode: expert.postalCode || "",
-    taxId: expert.taxId || "",
     timezone: expert.timezone || "",
-    availableDays: expert.schedule?.availableDays?.join(", ") || "",
-    timeSlots: expert.schedule?.timeSlots?.map((slot) => `${slot.day}: ${slot.slots.join(", ")}`).join("; ") || "",
-  })
+    schedule:{ availableDays: expert.schedule?.availableDays?.join(", ") || "",
+    timeSlots: expert.schedule?.timeSlots?.map((slot) => `${slot.day}: ${slot.slots.join(", ")}`).join("; ") || "",}
+  });
+  const [errors, setErrors] = useState({
+    expertise: "",
+    experienceYears: "",
+    linkedInProfile: "",
+    githubProfile: "",
+  });
+  const [selectedFileName, setSelectedFileName] = useState("")
+  const dispatch = useDispatch()
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = {
+      expertise: "",
+      experienceYears: "",
+      linkedInProfile: "",
+      githubProfile: "",
+      resumeUrl: ""
+    };
 
+    if (!profileData.expertise.trim()) {
+      newErrors.expertise = "Expertise is required";
+      isValid = false;
+    }
+
+    if (!profileData.experienceYears) {
+      newErrors.experienceYears = "Years of experience is required";
+      isValid = false;
+    }
+
+    if (!profileData.linkedInProfile.trim()) {
+      newErrors.linkedInProfile = "LinkedIn profile is required";
+      isValid = false;
+    } else if (!profileData.linkedInProfile.includes('linkedin.com')) {
+      newErrors.linkedInProfile = "Please enter a valid LinkedIn URL";
+      isValid = false;
+    }
+
+    if (!profileData.githubProfile.trim()) {
+      newErrors.githubProfile = "GitHub profile is required";
+      isValid = false;
+    } else if (!profileData.githubProfile.includes('github.com')) {
+      newErrors.githubProfile = "Please enter a valid GitHub URL";
+      isValid = false;
+    }
+
+
+
+    setErrors(newErrors);
+    return isValid;
+  };
   const handleChange = (e) => {
-    const { name, value } = e.target
-    setProfileData({ ...profileData, [name]: value })
+    const { name, value ,files} = e.target;
+  
+    if (name === "availableDays" || name === "timeSlots") {
+      setProfileData((prevData) => ({
+        ...prevData,
+        schedule: {
+          ...prevData.schedule,
+          [name]: value,
+        },
+      }));
+    }
+    else if(name === "resumeUrl") {
+      setProfileData((prevData)=>({ ...prevData, [name]: files[0] }))
+      setSelectedFileName(files[0]?.name || "")
+
+    } else {
+      setProfileData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }
+  };
+  
+  
+  const handleExpert = async ()=>{
+    try{
+     const getExpertDetails = await axios.get(BASE_URL + "/expert-details", { withCredentials: true });
+        dispatch(updateExpertStatus(getExpertDetails.data));
+    }
+    catch(err){
+      console.log(err)
+
+    }
+   
   }
+  useEffect(() => {
+    if (!expert?.expertId) {
+      handleExpert();
+    }
+  }, [expert?.expertId]);
+  
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
+    if (!validateForm()) {
+      return;
+    }
+    const payLoad = {
+      expertise: profileData.expertise.split(",").map(e => e.trim()).filter(Boolean),
+      experienceYears: profileData.experienceYears,
+      description: profileData.description,
+      certifications: profileData.certifications.split(",").map(c => c.trim()).filter(Boolean),
+      linkedInProfile: profileData.linkedInProfile,
+      resumeUrl: profileData.resumeUrl,
+      portfolioUrl: profileData.portfolioUrl,
+      githubProfile: profileData.githubProfile,
+      languages: profileData.languages.split(",").map(l => l.trim()).filter(Boolean),
+      timezone: profileData.timezone.trim(),
+      schedule: {
+        availableDays: (profileData.schedule.availableDays || "")
+          .split(",")
+          .map((day) => day.trim())
+          .filter(Boolean),
+        timeSlots: (profileData.schedule.timeSlots || "")
+          .split(";")
+          .filter(Boolean)
+          .map((entry) => {
+            const [day, slotsStr] = entry.split(":");
+            return {
+              day: day.trim(),
+              slots: (slotsStr || "")
+                .split(",")
+                .map((slot) => slot.trim())
+                .filter(Boolean),
+            };
+          }),
+      },
+    };
+ 
+    const formDataToSubmit = new FormData()
+    Object.keys(payLoad).forEach((key) => {
+      if (key === "schedule" ) {
+        formDataToSubmit.append(key, JSON.stringify(payLoad[key])); // Fix is here
+      } 
+      else if (key === "resumeUrl") {
+            if (selectedFileName) {
+          formDataToSubmit.append(key, payLoad[key]);
+        }
+      }
+      else {
+        formDataToSubmit.append(key, payLoad[key]);
+      }
+       
+    });
+    
     try {
-      const response = await axios.post(`${BASE_URL}/edit-expert-profile`, profileData, {
+      const res =  await axios.post(`${BASE_URL}/edit-expert-profile`, formDataToSubmit, {
+        headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       })
+      dispatch(updateExpertStatus(res.data))
       alert("Profile updated successfully!")
       navigate("/expert-profile")
     } catch (error) {
       console.error(error)
       alert("Failed to update profile. Please try again.")
     }
+    
   }
-
+  const extractFilename = (url)=> {
+    if (!url) return '';
+    // Handle both URL paths and full URLs
+    const lastSegment = url.split('/').pop();
+    // Remove query parameters if any
+    return lastSegment.split('?')[0];
+  }
   return (
     <div className="bg-gray-950 min-h-screen mt-16 flex justify-center items-center p-4 py-8">
       <div className="w-full max-w-4xl bg-gray-900 border border-gray-800 rounded-lg shadow-xl text-gray-100">
@@ -84,6 +230,7 @@ const EditExpertProfile = () => {
                   placeholder="Your area of expertise"
                   className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-600"
                 />
+                 {errors.expertise && <p className="text-red-500 text-xs mt-1">{errors.expertise}</p>}
               </div>
               <div className="space-y-1">
                 <label htmlFor="experienceYears" className="text-sm text-gray-400">
@@ -98,6 +245,7 @@ const EditExpertProfile = () => {
                   placeholder="Years of experience"
                   className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-600"
                 />
+                  {errors.experienceYears && <p className="text-red-500 text-xs mt-1">{errors.experienceYears}</p>}
               </div>
               <div className="space-y-1 col-span-2">
                 <label htmlFor="description" className="text-sm text-gray-400">
@@ -172,6 +320,7 @@ const EditExpertProfile = () => {
                     placeholder="https://linkedin.com/in/yourprofile"
                     className="w-full p-3 pl-10 bg-gray-800 border border-gray-700 rounded-md text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-600"
                   />
+                  {errors.linkedInProfile && <p className="text-red-500 text-xs mt-1">{errors.linkedInProfile}</p>}
                 </div>
               </div>
               <div className="space-y-1">
@@ -193,10 +342,53 @@ const EditExpertProfile = () => {
                     placeholder="https://github.com/yourusername"
                     className="w-full p-3 pl-10 bg-gray-800 border border-gray-700 rounded-md text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-600"
                   />
+                   {errors.githubProfile && <p className="text-red-500 text-xs mt-1">{errors.githubProfile}</p>}
+
                 </div>
               </div>
+              <div>
+  <label className="block text-slate-300 font-medium mb-2">
+    <span className="flex items-center">
+      <FileText className="w-4 h-4 mr-2" /> 
+      Resume (Optional Update)
+    </span>
+  </label>
+  
+  {expert.resumeUrl && (
+    <div className="mb-2 text-sm text-gray-400">
+      Current resume: <a 
+        href={expert.resumeUrl} 
+        target="_blank" 
+        rel="noopener noreferrer"
+        className="text-blue-400 hover:underline"
+      >
+        View Current Resume
+      </a>
+    </div>
+  )}
+
+  <div className="relative border rounded-lg bg-slate-700">
+    <input
+      type="file"
+      id="resume"
+      name="resumeUrl"
+      onChange={handleChange}
+      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+    />
+    <div className="flex items-center px-3 py-2">
+      <Upload className="w-5 h-5 text-slate-400 mr-2" />
+      <span className="text-slate-300 truncate">
+        {selectedFileName || "Choose file to update..."}
+      </span>
+    </div>
+  </div>
+  <p className="mt-1 text-xs text-gray-400">
+    Leave empty to keep current resume
+  </p>
+</div>
+              </div>
             </div>
-          </div>
+          
 
           <hr className="border-gray-800" />
 
@@ -215,7 +407,7 @@ const EditExpertProfile = () => {
                   type="text"
                   id="availableDays"
                   name="availableDays"
-                  value={profileData.availableDays}
+                  value={profileData.schedule.availableDays}
                   onChange={handleChange}
                   placeholder="Monday, Tuesday, Wednesday, etc."
                   className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-600"
@@ -228,7 +420,7 @@ const EditExpertProfile = () => {
                 <textarea
                   id="timeSlots"
                   name="timeSlots"
-                  value={profileData.timeSlots}
+                  value={profileData.schedule.timeSlots}
                   onChange={handleChange}
                   placeholder="Mon: 9 AM - 12 PM, 2 PM - 5 PM; Tue: 10 AM - 3 PM"
                   className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-600"
@@ -254,71 +446,7 @@ const EditExpertProfile = () => {
 
           <hr className="border-gray-800" />
 
-          {/* Address */}
-          <div className="space-y-4">
-            <div className="flex items-center">
-              <h3 className="text-lg font-semibold text-gray-200">Address</h3>
-              <div className="ml-3 h-px flex-grow bg-gray-800"></div>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <label htmlFor="country" className="text-sm text-gray-400">
-                  Country
-                </label>
-                <input
-                  type="text"
-                  id="country"
-                  name="country"
-                  value={profileData.country}
-                  onChange={handleChange}
-                  placeholder="Your country"
-                  className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-600"
-                />
-              </div>
-              <div className="space-y-1">
-                <label htmlFor="city" className="text-sm text-gray-400">
-                  City/State
-                </label>
-                <input
-                  type="text"
-                  id="city"
-                  name="city"
-                  value={profileData.city}
-                  onChange={handleChange}
-                  placeholder="Your city or state"
-                  className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-600"
-                />
-              </div>
-              <div className="space-y-1">
-                <label htmlFor="postalCode" className="text-sm text-gray-400">
-                  Postal Code
-                </label>
-                <input
-                  type="text"
-                  id="postalCode"
-                  name="postalCode"
-                  value={profileData.postalCode}
-                  onChange={handleChange}
-                  placeholder="Your postal code"
-                  className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-600"
-                />
-              </div>
-              <div className="space-y-1">
-                <label htmlFor="taxId" className="text-sm text-gray-400">
-                  Tax ID
-                </label>
-                <input
-                  type="text"
-                  id="taxId"
-                  name="taxId"
-                  value={profileData.taxId}
-                  onChange={handleChange}
-                  placeholder="Your tax ID"
-                  className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-600"
-                />
-              </div>
-            </div>
-          </div>
+          
 
           {/* Submit Button */}
           <div className="pt-4 flex justify-end">
