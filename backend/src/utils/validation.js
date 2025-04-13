@@ -32,7 +32,9 @@ const validateExpertFormData = (req)=>{
    return true;
 } 
 const validateEditExpertProfileData = (req)=>{
-   const allowedEditFields = ["expertise","experienceYears","description","certifications","linkedInProfile","githubProfile","portfolioUrl","resumeUrl",];
+   const allowedEditFields = ["expertise","experienceYears","description","certifications","linkedInProfile","githubProfile","portfolioUrl","resumeUrl","languages",
+      "timezone","schedule","timeSlots"
+   ];
    const isEditAllowed = Object.keys(req.body).every((field)=>allowedEditFields.includes(field)
    );
    return isEditAllowed;

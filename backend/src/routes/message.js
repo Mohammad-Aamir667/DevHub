@@ -53,7 +53,7 @@ messageRouter.get('/conversations',userAuth,async (req,res)=>{
     const fromUserId = req.user._id; 
     const conversations = await Conversation.find({ 
         participants: fromUserId 
-    }).populate("participants", "firstName photoUrl lastName").populate( "lastMessage","messageText timestamp"); 
+    }).populate("participants", "firstName photoUrl lastName").populate( "lastMessage","messageText timestamp fileUrl"); 
     
     res.status(200).json(conversations);
   } catch (error) {

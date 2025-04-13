@@ -81,8 +81,6 @@ const expertDetailsSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
-
-    // Additional fields
     languages: {
       type: [String],
       default: [],
@@ -94,13 +92,13 @@ const expertDetailsSchema = new mongoose.Schema(
     schedule: {
       availableDays: {
         type: [String],
-        default: [], // e.g., ["Monday", "Wednesday"]
+        default: [], 
       },
       timeSlots: {
         type: [
           {
-            day: { type: String, required: true }, // e.g., "Monday"
-            slots: { type: [String], required: true }, // e.g., ["10 AM - 12 PM", "2 PM - 4 PM"]
+            day: { type: String,  }, // e.g., "Monday"
+            slots: { type: [String],  }, // e.g., ["10 AM - 12 PM", "2 PM - 4 PM"]
           },
         ],
         default: [],

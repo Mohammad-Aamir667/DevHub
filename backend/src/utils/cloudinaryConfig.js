@@ -6,29 +6,30 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const generateSignature = (paramsToSign) => {
-  return cloudinary.utils.api_sign_request(
-    paramsToSign,
-    cloudinary.config().api_secret
-  );
-};
-
-const uploadToCloudinary = async (filePath) => {
+const uploadToCloudinary = async (file) => {
   try {
-    const timestamp = Math.floor(Date.now() / 1000);
-    const paramsToSign = { timestamp, use_filename: true, unique_filename: false };
+    const filePath = file.path;
+    const mimetype = file.mimetype;
 
-    const signature = generateSignature(paramsToSign);
-    console.log("Generated Signature:", signature); // Debugging
+    let resource_type = "auto";
+    if (
+      mimetype === "application/pdf" ||
+      mimetype === "application/msword" ||
+      mimetype === "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    ) {
+      resource_type = "raw";
+    }
 
     const result = await cloudinary.uploader.upload(filePath, {
-      api_key: cloudinary.config().api_key,
-      timestamp,
-      signature,
-      resource_type: "auto",
+      resource_type,
       use_filename: true,
       unique_filename: false,
     });
+
+    // For PDF force download
+    if (mimetype === "application/pdf") {
+      return result.secure_url + "?fl_attachment=true";
+    }
 
     return result.secure_url;
   } catch (error) {
@@ -39,6 +40,5 @@ const uploadToCloudinary = async (filePath) => {
 
 module.exports = {
   cloudinary,
-  generateSignature,
   uploadToCloudinary,
 };

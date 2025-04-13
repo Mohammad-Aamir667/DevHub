@@ -7,8 +7,8 @@ async function createSuperAdmin() {
     try {
         await connectDB();
         console.log("Connected to the database for Super Admin creation.");
-        const existingAdmin = await User.findOne({ emailId: "aamireverlasting786@gmail.com" });
-        if (existingAdmin){
+        const existingSuperAdmin = await User.findOne({ emailId: "aamireverlasting786@gmail.com" });
+        if (existingSuperAdmin){
             console.log("Super Admin already exists. No action taken.");
             return;
         }

@@ -29,7 +29,7 @@ expertRouter.post("/become-expert", upload.single("resume"), userAuth, async (re
     // if (!validateExpertFormData(req)) {
     //   return res.status(400).json("Invalid expert data");
     // }
-    const resumeUrl = await uploadToCloudinary(req.file.path);
+    const resumeUrl = await uploadToCloudinary(req.file);
 
     const { expertise, experienceYears, description, certifications, linkedInProfile, githubProfile, portfolioUrl } = req.body;
 
@@ -102,7 +102,7 @@ expertRouter.get("/expert-details", userAuth, async (req, res) => {
       return res.status(200).json({ expertId, status: "rejected" });
     } else {
       const filteredExpertDetails = await ExpertDetails.findOne({ expertId: expertId })
-        .select("expertId expertise experienceYears description certifications linkedInProfile githubProfile portfolioUrl resumeUrl status profileUpdated");
+        .select("expertId expertise experienceYears description certifications linkedInProfile githubProfile portfolioUrl resumeUrl status profileUpdated languages timezone schedule reviews rating");
 
       return res.status(200).json(filteredExpertDetails);
     }

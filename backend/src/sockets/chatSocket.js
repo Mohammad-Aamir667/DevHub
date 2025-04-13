@@ -4,16 +4,18 @@ const Message = require("../models/message");
 const User = require("../models/user");
 
 const chatSocket = (io, socket, socketUserMap) => {
-  console.log("Chat socket initialized");
+  
 
   socket.on("joinRoom", (roomId) => {
     socket.join(roomId);
-    console.log(`User joined room: ${roomId}`);
+    
   });
+  
+  
 
   socket.on("leaveRoom", (roomId) => {
     socket.leave(roomId);
-    console.log(`User left room: ${roomId}`);
+    
   });
   socket.on("sendMessage", async (data) => {
   try{
@@ -69,7 +71,7 @@ const chatSocket = (io, socket, socketUserMap) => {
       message.conversation = conversation._id;
       await message.save();
        const roomId = generateRoomId(fromUserId._id,toUserId) 
-     console.log("roomId",roomId)
+    
       socket.broadcast.to(roomId).emit('receiveMessage', { messageText, fromUserId, file, fileUrl, timestamp });
     }
 

@@ -5,7 +5,7 @@ const socketManager = (io) => {
   const socketUserMap = {}; // Maintain user mappings for chat
 
   io.on("connection", (socket) => {
-    console.log(`User connected: ${socket.id}`);
+    
 
     // Initialize each module with the same `io` and `socket`
     chatSocket(io, socket, socketUserMap);

@@ -14,8 +14,10 @@ fileRouter.post("/file-send/:chatId", upload.single("file"), userAuth, async (re
     const fromUserId = req.user._id;
     const chatId = req.params.chatId.trim();
      const conversation = await Conversation.findById(chatId);
+     console.log("file",req.file);
      if(conversation){
-      const fileUrl = await uploadToCloudinary(req.file.path);
+     
+      const fileUrl = await uploadToCloudinary(req.file);
      return res.json({ url: fileUrl });
      }
      const toUserId = chatId;
@@ -34,7 +36,7 @@ fileRouter.post("/file-send/:chatId", upload.single("file"), userAuth, async (re
     if (!existingConnection) {
       return res.status(400).send("You are not connected to this user.");
     }
-    const fileUrl = await uploadToCloudinary(req.file.path);
+    const fileUrl = await uploadToCloudinary(req.file);
     res.json({ url: fileUrl });
   } catch (error) {
     res.status(500).json({ error: error.message });
