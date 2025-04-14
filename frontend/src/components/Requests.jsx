@@ -21,7 +21,9 @@ const Requests = () => {
       console.error("Error updating request:", err);
     }
   };
-
+  const viewProfile = (feedUser) => {
+    navigate(`/view-profile`, { state: { userProfile: feedUser } });
+  };
   const getRequests = async () => {
     setIsLoading(true);
     try {
@@ -69,7 +71,7 @@ const Requests = () => {
           
           return (
             <div key={_id} className="w-full">
-              <div className="bg-gray-900 rounded-lg shadow-lg overflow-hidden border border-gray-800 hover:border-blue-600 transition-all">
+              <div onClick={() => viewProfile(request.fromUserId)} className="bg-gray-900 rounded-lg shadow-lg overflow-hidden border border-gray-800 hover:border-blue-600 transition-all">
                 <div className="flex flex-col md:flex-row p-4 gap-4">
                   <div className="flex-shrink-0 flex justify-center">
                     {photoUrl ? (
