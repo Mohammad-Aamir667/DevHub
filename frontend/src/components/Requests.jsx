@@ -53,14 +53,14 @@ const Requests = () => {
 
   if (!requests || requests.length === 0) {
     return (
-      <div className="flex justify-center items-center mt-10 bg-gray-900 rounded-lg p-8 shadow-lg">
+      <div className="min-h-screen bg-gradient-to-b mt-14 from-slate-950 to-slate-900 pt-5 px-6 py-12">
         <h1 className="text-xl font-semibold text-gray-200">No requests found</h1>
       </div>
     );
   }
 
   return (
-    <div className="flex justify-center items-center flex-col mt-10 space-y-6 w-full max-w-4xl mx-auto px-4">
+    <div className="min-h-screen bg-gradient-to-b mt-14 from-slate-950 to-slate-900 pt-5 px-6 py-12">
       <h1 className="text-2xl font-bold text-white">
         Connection Requests <span className="text-blue-500">({reqLen})</span>
       </h1>
@@ -71,7 +71,7 @@ const Requests = () => {
           const { firstName, lastName, about, photoUrl } = request.fromUserId;
           
           return (
-            <div key={_id} className="min-h-screen bg-gradient-to-b mt-14 from-slate-950 to-slate-900 pt-5 px-6 py-12">
+            <div key={_id} className="w-full">
               <div onClick={() => viewProfile(request.fromUserId)} className="bg-gray-900 cursor-pointer rounded-lg shadow-lg overflow-hidden border border-gray-800 hover:border-blue-600 transition-all">
                 <div className="flex flex-col md:flex-row p-4 gap-4">
                   <div className="flex-shrink-0 flex justify-center">
