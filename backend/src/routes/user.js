@@ -17,7 +17,8 @@ userRouter.get("/user/requests/received",userAuth,async(req,res)=>{
         })
       }       
       catch(err){
-        res.status(500).send("something went wrong");
+        console.error(err);
+        res.status(500).send("Server error");
       }
 })
 userRouter.get("/user/connection",userAuth,async(req,res)=>{
@@ -35,14 +36,11 @@ userRouter.get("/user/connection",userAuth,async(req,res)=>{
           }
           return row.fromUserId;
        });
-       res.json({
-        data
-       })
+       res.json({data})
       }
       catch(err){
-        res.status(400).json({
-            message:err,
-        });
+        console.error(err);
+        res.status(500).send("Server error");
       }
 })
 userRouter.get("/feed",userAuth,async (req,res)=>{
@@ -72,7 +70,7 @@ userRouter.get("/feed",userAuth,async (req,res)=>{
       res.json(users);
     }
     catch(err){
-            res.status(400).json({message:err.mesaage});
+            res.status(500).json({message:err.message});
     }
 })
 module.exports = userRouter;

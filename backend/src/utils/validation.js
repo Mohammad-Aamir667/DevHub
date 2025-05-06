@@ -1,22 +1,37 @@
 const validator = require("validator");
-const validateSignUpData = (req)=>{
-       const {firstName,lastName,emailId,password} = req.body; 
-         if(!firstName ){
-              throw new Error("Enter a valid name");
-          }
-         else if(!validator.isEmail(emailId)){
-            throw new Error("Enter a valid email")
-         }
-         else if(!validator.isStrongPassword(password)){
-            throw new Error("Enter a strong password")
-         }  
-} 
-const validateEditProfileData = (req)=>{
-   const allowedEditFields = ["firstName","lastName","age","gender","age","about","skills","photoUrl",];
-   const isEditAllowed = Object.keys(req.body).every((field)=>allowedEditFields.includes(field)
-   );
-   return isEditAllowed;
-}
+const validateSignUpData = (req) => {
+  const { firstName, emailId, password } = req.body;
+
+  if (!firstName.trim()) {
+    const err = new Error("Enter a valid name");
+    err.statusCode = 400;
+    throw err;
+  }
+
+  if (!validator.isEmail(emailId)) {
+    const err = new Error("Enter a valid email");
+    err.statusCode = 400;
+    throw err;
+  }
+
+  if (!validator.isStrongPassword(password)) {
+    const err = new Error("Enter a strong password");
+    err.statusCode = 400;
+    throw err;
+  }
+};
+const validateEditProfileData = (req) => {
+  const allowedEditFields = ["firstName", "lastName", "age", "gender", "about", "skills", "photoUrl"];
+  const requiredFields = ["firstName"]; // Add required fields here
+
+  const bodyKeys = Object.keys(req.body);
+
+  const isEditAllowed = bodyKeys.every(field => allowedEditFields.includes(field));
+  const areRequiredFieldsPresent = requiredFields.every(field => bodyKeys.includes(field) && req.body[field]);
+
+  return isEditAllowed && areRequiredFieldsPresent;
+};
+
 const validateExpertFormData = (req)=>{
    // const allowedExpertFormData = ["expertise","experienceYears","description","certifications","linkedInProfile","githubProfile","portfolioUrl",];
    // const isAllowedExpertFormData = Object.keys(req.body).every((field)=>allowedExpertFormData.includes(field)

@@ -7,38 +7,48 @@ const authRouter = express.Router();
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const { userAuth } = require("../middlewares/auth");
-authRouter.post("/signup", async (req, res)=>{
-     try {
-        validateSignUpData(req); 
-        const {firstName,lastName,emailId,password} = req.body;
-        const existingUser = await User.findOne({ emailId });
-        if (existingUser) {
-            throw new Error("Email is already registered");
-        }
-        const passwordHash = await bcrypt.hash(password,10);
-        const user = new User({
-            firstName,
-            lastName,
-            emailId,
-            password:passwordHash,
-           
-        });
-        await user.save();
-        const token = await user.getJWT();
-        const userData = user.toObject();
-        delete userData.password;
-        res.cookie("token", token, {
-          httpOnly: true,
-          secure: true,  // ✅ Required for HTTPS (Render & Vercel)
-          sameSite: "none",  // ✅ Allow cross-origin cookies
-        });
-        res.json(userData);
-}
-catch(err){
-    res.status(400).send("some error " + err.message);
-}
+authRouter.post("/signup", async (req, res) => {
+  try {
+    validateSignUpData(req);
 
-})
+    const { firstName, lastName, emailId, password } = req.body;
+    const existingUser = await User.findOne({ emailId });
+
+    if (existingUser) {
+      return res.status(400).json("Email is already registered");
+    }
+
+    const passwordHash = await bcrypt.hash(password, 10);
+    const user = new User({
+      firstName,
+      lastName,
+      emailId,
+      password: passwordHash,
+    });
+
+    await user.save();
+
+    const token = await user.getJWT();
+    const userData = user.toObject();
+    delete userData.password;
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    });
+
+    res.json(userData);
+  } catch (err) {
+    if (err.statusCode === 400) {
+      return res.status(400).json(err.message);
+    }
+
+    console.error(err);
+    res.status(500).send("Server error");
+  }
+});
+
 authRouter.post("/login",async (req,res)=>{
     try{ 
          const {emailId,password} = req.body;
@@ -47,7 +57,9 @@ authRouter.post("/login",async (req,res)=>{
        return res.status(401).send("Invalid credentials");
       }
      const isPasswordValid = await user.validatePassword(password)
-     if(isPasswordValid){
+     if (!isPasswordValid) {
+      return res.status(401).send("Invalid credentials");
+    }
         const token = await user.getJWT();
         const userData = user.toObject();
             delete userData.password;
@@ -58,25 +70,27 @@ authRouter.post("/login",async (req,res)=>{
             });
         res.cookie("token",token);
         res.json(userData);
-     }
-     else{
-        throw new Error("Incorrect password");
-     }
     }
-     catch(err){
-        res.status(401).send("Error "+ err.message);
-     }
+    catch (err) {
+      res.status(500).send("Server error");
+    }
 })
-authRouter.post("/logout",async (req,res)=>{
-  res.cookie("token", "", {
-    httpOnly: true,
-    secure: true,  
-    sameSite: "None", 
-    expires: new Date(0),
-    path: "/"
-  });
-      res.send("logout successfully");
+authRouter.post("/logout", async (req, res) => {
+  try {
+    res.cookie("token", "", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+      expires: new Date(0),
+      path: "/"
+    });
+    return res.status(200).json({ message: "Logout successful" });
+  } catch (err) {
+    console.error("Logout error:", err);
+    return res.status(500).json({ message: "Logout failed", error: err.message });
+  }
 });
+
 authRouter.post("/forget-password",async(req,res)=>{
      try{
        const {emailId} = req.body;

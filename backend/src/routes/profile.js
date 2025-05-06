@@ -20,7 +20,7 @@ profileRouter.get("/profile",userAuth,async (req,res)=>{
 profileRouter.post("/editProfile",userAuth,async (req,res)=>{
    try{
     if(!validateEditProfileData(req)){
-     throw new Error("Invalid Edit Request");
+  res.status(400).send("Invalid Edit Request");
 }
    const loggedInUser = req.user;
    Object.keys(req.body).forEach((key)=>{
@@ -31,8 +31,8 @@ profileRouter.post("/editProfile",userAuth,async (req,res)=>{
    loggedInUser,
    )
 }
-catch(err){
-    res.status(400).send("ERROR" + err.message);
+catch (err) {
+  res.status(500).send("Server error");
 }
 
 })

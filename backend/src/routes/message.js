@@ -18,7 +18,7 @@ messageRouter.get('/messages/:chatId',userAuth, async (req, res) => {
         const toUserId = chatId;
         const toUser = await User.findById(toUserId);
              if(!toUser){
-        return res.status(400).send("User not found");
+        return res.status(404).json("User not found");
         }
     // const existingConnection = await connectionRequest.findOne({
     //                        $or: [
@@ -64,8 +64,7 @@ messageRouter.post('/create-group-chat', userAuth, async (req, res) => {
   try {
       const { groupName, participantIds } = req.body;
       const fromUserId = req.user.id;
-      console.log(participantIds)
-      if (participantIds.length < 1) {
+            if (participantIds.length < 1) {
           return res.status(400).json({ message: "A group must have at least 2 participants." });
       }
       const existingParticipantsConnections = await Promise.all(

@@ -6,9 +6,8 @@ const connectionRequest = require("../models/connectionRequest");
 const user = require("../models/user");
 requestRouter.post("/request/send/:status/:toUserId",userAuth,async (req,res)=>{
                 try{ 
-                   const fromUserId = req.user._id;
+                  const fromUserId = req.user._id;
                   const toUserId = req.params.toUserId.trim();
-                  ;
                   const status = req.params.status;
                   const allowedStatus = ["ignored","interested"];   
                   if(!allowedStatus.includes(status)){
@@ -35,14 +34,11 @@ requestRouter.post("/request/send/:status/:toUserId",userAuth,async (req,res)=>{
                   const newConnectionRequest = new connectionRequest({
                     fromUserId,toUserId,status,
                   });
-                  const data = await newConnectionRequest.save();
-                 return res.send(
-                    "Connection Request sent successfully"
-                  )
+                  await newConnectionRequest.save();
+                 return res.send("Connection Request sent successfully")
 }
-catch(err){
-    res.status(400).send("something went wrong !!" + err.message);  
-
+catch (err) {
+  res.status(500).send("Server error");
 }
 })
 requestRouter.post("/request/review/:status/:requestId",userAuth,async(req,res)=>{
@@ -66,23 +62,12 @@ requestRouter.post("/request/review/:status/:requestId",userAuth,async(req,res)=
             })
         }   
         existingConnectionRequest.status = status;
-      const data = await existingConnectionRequest.save();
-   
+     await existingConnectionRequest.save();
       res.send(" save successfully")
 }
 catch(err){
     console.error("Error reviewing request:", err);
-    res.status(500).json({ err: "Internal Server Error" });
-
+    res.status(500).json({ err: " Server Error" });
 }
-     
-
-    
-
-     
-
-
-
-
 })    
 module.exports = requestRouter; 
