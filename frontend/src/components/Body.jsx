@@ -33,8 +33,10 @@ const Body = () =>{
        }
        catch(err){
         console.log(err)
-       if(err.status === 401)
+       if(err.status === 401){
         navigate("/login"); 
+       }
+     
 else alert(err.response?.data)
        }
   }
@@ -56,7 +58,7 @@ useEffect(()=>{
   fetchUser();
  if(expertDetails.expertId === null )
    handleExpert();
-},[expertDetails,user]);
+},[user]);
 
  
   return (

@@ -10,8 +10,6 @@ const Profile = () => {
   const { firstName, lastName, photoUrl, age, gender, about, skills } = user || {}
 
   const handleEditProfile = () => navigate("/editProfile")
-
-  // Parse skills if it's a string
   const skillsArray =
     typeof skills === "string" ? skills.split(",").map((skill) => skill.trim()) : Array.isArray(skills) ? skills : []
 

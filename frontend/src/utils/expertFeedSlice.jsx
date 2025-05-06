@@ -7,9 +7,8 @@ const expertFeedSlice = createSlice({
         addExpertFeed :(state,action)=>{
                return action.payload
         },
-        removeExpertFeed:(state,action)=>{
-            const newArray = state.filter((res)=>res._id !== action.payload);
-               return newArray;
+        removeExpertFeed:()=>{
+            return null;
      }
     }
 })

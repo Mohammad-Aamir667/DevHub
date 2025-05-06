@@ -9,13 +9,13 @@ const ExpertDetail = ({ expert, onBack }) => {
   const { pending, approved, rejected } = useSelector((state) => state.experts);
 
   const handleReview = async (status) =>{ 
-         const expertId = expert.expertId._id;
+         const expertId = expert?.expertId?._id;
         try{
           const res = await axios.post(BASE_URL+"/expert/review/"+status+"/"+expertId,{},{withCredentials:true});
-          const expert = pending.find((expert) => expert.expertId._id === expertId);
+          const expert = pending.find((expert) => expert?.expertId?._id === expertId);
           if (expert) {
             // Remove the expert from the pending list
-            const updatedPending = pending.filter((expert) => expert.expertId._id !== expertId);
+            const updatedPending = pending.filter((expert) => expert?.expertId?._id !== expertId);
       
             // Update the status of the expert (add to approved or rejected list)
             let updatedApproved = [...approved];
@@ -50,27 +50,27 @@ const ExpertDetail = ({ expert, onBack }) => {
         />
         <div>
           <h2 className="text-2xl font-bold text-gray-800">
-            {expert.expertId.firstName} {expert.expertId.lastName}
+            {expert?.expertId?.firstName} {expert?.expertId?.lastName}
           </h2>
-          <p className="text-gray-600">{expert.expertId.about}</p>
+          <p className="text-gray-600">{expert?.expertId?.about}</p>
         </div>
       </div>
 
       <div className="space-y-4">
         <div>
           <h3 className="text-lg font-semibold text-gray-700">Expertise</h3>
-          <p className="text-gray-800">{expert.expertise.join(", ")}</p>
+          <p className="text-gray-800">{expert?.expertise.join(", ")}</p>
         </div>
 
         <div>
           <h3 className="text-lg font-semibold text-gray-700">Experience</h3>
-          <p className="text-gray-800">{expert.experienceYears} years</p>
+          <p className="text-gray-800">{expert?.experienceYears} years</p>
         </div>
 
         {expert.description && (
           <div>
             <h3 className="text-lg font-semibold text-gray-700">Description</h3>
-            <p className="text-gray-800">{expert.description}</p>
+            <p className="text-gray-800">{expert?.description}</p>
           </div>
         )}
 
@@ -78,7 +78,7 @@ const ExpertDetail = ({ expert, onBack }) => {
           <h3 className="text-lg font-semibold text-gray-700">Links</h3>
           <div className="space-y-2">
             <a
-              href={expert.linkedInProfile}
+              href={expert?.linkedInProfile}
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-600 hover:underline"
@@ -140,7 +140,7 @@ const ExpertDetail = ({ expert, onBack }) => {
             </button>
             <button
               className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg"
-              onClick={() => handleReview("Rejected")}
+              onClick={() => handleReview("rejected")}
             >
               Reject
             </button>

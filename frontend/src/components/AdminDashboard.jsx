@@ -13,28 +13,29 @@ const AdminDashboard = () => {
   const [currentStatus, setCurrentStatus] = useState("pending");
   const [selectedExpert, setSelectedExpert] = useState(null);
   const navigate = useNavigate();
+  const fetchExperts = async () => {
+    try {
+      const response = await axios.get(BASE_URL+"/expert-list", {
+        withCredentials: true,
+      });
+      const allExperts = response.data;
+      dispatch(
+        setExperts({
+          pending: allExperts.filter((e) => e.status === "pending"),
+          approved: allExperts.filter((e) => e.status === "approved"),
+          rejected: allExperts.filter((e) => e.status === "rejected"),
+        })
+       
+      );
+    } catch (error) {
+      console.error("Error fetching experts:", error);
+    }
+  };
   useEffect(() => {
-    const fetchExperts = async () => {
-      try {
-        const response = await axios.get(BASE_URL+"/expert-list", {
-          withCredentials: true,
-        });
-        const allExperts = response.data;
-        dispatch(
-          setExperts({
-            pending: allExperts.filter((e) => e.status === "pending"),
-            approved: allExperts.filter((e) => e.status === "approved"),
-            rejected: allExperts.filter((e) => e.status === "rejected"),
-          })
-         
-        );
-      } catch (error) {
-        console.error("Error fetching experts:", error);
-      }
-    };
-    console.log(experts)
+ 
+  if(!experts || experts.length === 0) 
     fetchExperts();
-  }, [dispatch]);
+  }, []);
 
   const handleStatusChange = (status) => {
     setCurrentStatus(status);

@@ -1,4 +1,3 @@
-"use client"
 
 import { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
@@ -8,6 +7,7 @@ import { addUser } from "../utils/userSlice"
 import ProfilePictureUpload from "./ProfilePictureUpload"
 import { useNavigate } from "react-router-dom"
 import { ArrowLeft, Save, Upload } from "lucide-react"
+import { handleAxiosError } from "../utils/handleAxiosError"
 
 const EditProfile = () => {
   const user = useSelector((store) => store.user)
@@ -23,25 +23,35 @@ const EditProfile = () => {
   const [photoUrl, setPhotoUrl] = useState(user?.photoUrl || "")
   const [error, setError] = useState("")
   const [showToast, setShowToast] = useState(false)
+  const [apiError, setApiError] = useState(false);
 
   const saveProfile = async () => {
+    if (!firstName) {
+      setError("First name is required");
+      return;
+    }
     setError("")
     try {
+      setApiError(false)
       const res = await axios.post(
         `${BASE_URL}/editProfile`,
-        { firstName, lastName, age, gender, about, skills, photoUrl },
+        { firstName , lastName, age, gender, about, skills, photoUrl },
         { withCredentials: true },
       )
-      dispatch(addUser(res.data))
+      dispatch(addUser(res.data));
       setShowToast(true)
       setTimeout(() => setShowToast(false), 3000)
     } catch (err) {
-      setError(err.message)
+      console.log(err)
+      if(err?.response?.status === 400) {
+        setError(err.message);
+      }
+      else {
+        handleAxiosError(err, {}, [400], "edit-profile-error-toast")
+        setApiError(true)}
     }
   }
 
-  // This is a simplified version of the ProfilePictureUpload component
-  // since we're keeping the original component's functionality
   const CustomProfilePictureUpload = () => {
     return (
       <div className="flex flex-col items-center mb-6">
@@ -49,8 +59,23 @@ const EditProfile = () => {
       </div>
     )
   }
+  if (apiError) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-950 to-slate-900 flex items-center justify-center px-4">
+        <div className="bg-slate-800 border border-slate-700 p-8 rounded-xl text-center max-w-md w-full">
+          <h2 className="text-xl font-semibold text-red-400 mb-2">Failed to upload profile</h2>
+          <p className="text-slate-400 mb-4">Something went wrong while uploading your profile. Please try again.</p>
+          <button
+            onClick={saveProfile}
+            className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-4 py-2 rounded-md font-medium hover:opacity-90 transition"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    )
+  }
   
-
   return (
     <div className="min-h-screen mt-2 pt-16 bg-gradient-to-b from-slate-950 to-slate-900 py-12 px-6 flex justify-center">
       <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-xl shadow-xl relative">

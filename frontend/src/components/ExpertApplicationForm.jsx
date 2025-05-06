@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux"
 import Toast from "./Toast"
 import { updateExpertStatus } from "../utils/expertDetailsSlice"
 import { ArrowLeft, Upload, XCircle, FileText, Github, Linkedin, Globe, Clock } from "lucide-react"
+import { handleAxiosError } from "../utils/handleAxiosError"
 
 const ExpertApplicationForm = () => {
   const [isModalOpen, setModalOpen] = useState(false)
@@ -16,6 +17,7 @@ const ExpertApplicationForm = () => {
   const dispatch = useDispatch()
   const [showToast, setShowToast] = useState(false)
   const expertDetails = useSelector((store) => store.expertDetails)
+  const [apiError,setAPIError] = useState(false)
 
   const onClose = useCallback(() => {
     setShowToast(false)
@@ -47,6 +49,7 @@ const ExpertApplicationForm = () => {
 
   const handleExpertFormSubmit = async (formData) => {
     try {
+      setAPIError(false) 
       const res = await axios.post(BASE_URL + "/become-expert", formData, {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
@@ -54,8 +57,8 @@ const ExpertApplicationForm = () => {
       dispatch(updateExpertStatus({ expertId: res.data.expertId, status: "pending" }))
       setShowToast(true)
     } catch (error) {
-      console.error("Error submitting application:", error)
-      alert("There was an issue submitting your application.")
+        setAPIError(true)
+        handleAxiosError(error, {}, [], "expert-application-error")
     }
   }
 
@@ -94,6 +97,22 @@ const ExpertApplicationForm = () => {
   }
 
   // Render application status screens
+  if (apiError) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-950 to-slate-900 flex items-center justify-center px-4">
+        <div className="bg-slate-800 border border-slate-700 p-8 rounded-xl text-center max-w-md w-full">
+          <h2 className="text-xl font-semibold text-red-400 mb-2">Failed to submit expert form</h2>
+          <p className="text-slate-400 mb-4">Something went wrong while submitting your expert form. Please try again.</p>
+          <button
+            onClick={handleOpenModal}
+            className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-4 py-2 rounded-md font-medium hover:opacity-90 transition"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    )
+  }
   if (expertDetails.expertId) {
     if (expertDetails.status === "pending") {
       return (

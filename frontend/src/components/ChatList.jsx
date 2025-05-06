@@ -1,6 +1,4 @@
-"use client"
-
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { fetchConversations } from "../utils/store"
 import { useNavigate } from "react-router-dom"
@@ -8,6 +6,7 @@ import { PlusCircle, MessageCircle, Users, ArrowLeft } from 'lucide-react'
 import { addConnections } from "../utils/connectionSlice"
 import axios from "axios"
 import { BASE_URL } from "../utils/constants"
+import { handleAxiosError } from "../utils/handleAxiosError"
 
 const ChatList = () => {
   const dispatch = useDispatch()
@@ -16,7 +15,9 @@ const ChatList = () => {
   const user = useSelector((state) => state.user)
   const loggedInUser = user?._id
   const connections = useSelector((state) => state.connections)
+  const [error, setError] = useState(false)
   useEffect(() => {
+   if (!conversations || conversations.length === 0) 
     dispatch(fetchConversations())
   }, [dispatch])
 
@@ -32,12 +33,15 @@ const ChatList = () => {
 
   const getConnections = async () => {
     try {
+      setError(false) 
       const res = await axios.get(BASE_URL + "/user/connection", {
         withCredentials: true,
       })
       dispatch(addConnections(res?.data))
     } catch (err) {
-      console.log(err.message)
+      console.log(err.message);
+      setError(true) 
+      handleAxiosError(err, {},[],"connection-error-toast");
     }
   }
 
@@ -64,7 +68,22 @@ const ChatList = () => {
       return date.toLocaleDateString([], { month: 'short', day: 'numeric' })
     }
   }
-
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-950 to-slate-900 flex items-center justify-center px-4">
+        <div className="bg-slate-800 border border-slate-700 p-8 rounded-xl text-center max-w-md w-full">
+          <h2 className="text-xl font-semibold text-red-400 mb-2">Failed to load Messages</h2>
+          <p className="text-slate-400 mb-4">Something went wrong while fetching your Messages. Please try again.</p>
+          <button
+            onClick={getConnections}
+            className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-4 py-2 rounded-md font-medium hover:opacity-90 transition"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    )
+  }
   return (
     <div className="min-h-screen bg-gradient-to-b -mt-10 from-slate-950 to-slate-900 pt-16 px-4 sm:px-6 py-8">
       <div className="max-w-3xl mx-auto">

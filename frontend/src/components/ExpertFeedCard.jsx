@@ -4,6 +4,7 @@ import { Star, Clock, Calendar, ExternalLink } from "lucide-react"
 import { Link } from "react-router-dom"
 
 const ExpertFeedCard = ({ expertDetails }) => {
+  console.log(expertDetails)
   const {
     expertise = [],
     experienceYears,
@@ -102,7 +103,7 @@ const ExpertFeedCard = ({ expertDetails }) => {
         <Link
           to={`/expert/${expertId?._id}`}
           state={{ expertDetails }}
-          className="block w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors text-center flex items-center justify-center"
+          className=" w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors text-center flex items-center justify-center"
         >
           View Profile <ExternalLink className="w-3.5 h-3.5 ml-2" />
         </Link>

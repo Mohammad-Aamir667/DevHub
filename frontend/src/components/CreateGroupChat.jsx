@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom"
 import { addConversation } from "../utils/conversationsSlice"
 import { addConnections } from "../utils/connectionSlice"
 import { ArrowLeft, Users, Check, X, UserPlus } from 'lucide-react'
+import { handleAxiosError } from "../utils/handleAxiosError"
 
 const CreateGroupChat = () => {
   const [selectedParticipants, setSelectedParticipants] = useState([])
@@ -25,7 +26,6 @@ const CreateGroupChat = () => {
       return isAlreadySelected ? prev.filter((p) => p._id !== connection._id) : [...prev, connection]
     })
   }
-
   const getConnections = async () => {
     try {
       const res = await axios.get(BASE_URL + "/user/connection", { withCredentials: true })
@@ -47,6 +47,7 @@ const CreateGroupChat = () => {
 
     try {
       const participantIds = selectedParticipants.map((p) => p._id)
+      console.log(participantIds);
       const res = await axios.post(
         BASE_URL + "/create-group-chat",
         { participantIds, groupName },
@@ -55,8 +56,12 @@ const CreateGroupChat = () => {
       dispatch(addConversation(res.data))
       navigate("/chat-list")
     } catch (err) {
+      if(err.response?.status === 400) 
       setError(err.response?.data?.message || "An unexpected error occurred. Please try again.")
+      handleAxiosError(err, {}, [400], "group-chat-error-toast")
+
     }
+
   }
 
   // Filter connections based on search term

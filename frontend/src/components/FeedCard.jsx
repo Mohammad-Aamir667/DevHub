@@ -4,8 +4,9 @@ import { removeFeed } from "../utils/feedSlice";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 import { useNavigate } from "react-router-dom";
-import { UserX, UserCheck, User } from "lucide-react";
+import { UserX, UserCheck, User, HandHelping } from "lucide-react";
 import { Tooltip } from "react-tooltip";
+import { handleAxiosError } from "../utils/handleAxiosError";
 
 const FeedCard = ({ feedUser }) => {
   const dispatch = useDispatch();
@@ -27,7 +28,7 @@ const FeedCard = ({ feedUser }) => {
       dispatch(removeFeed(_id));
       setConfirmAction(null); 
     } catch (err) {
-      console.error(err);
+     handleAxiosError(err,{},[],"Error occurred while sending request");
     }
   };
 

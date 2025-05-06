@@ -9,41 +9,53 @@ import { addExpertFeed } from "../utils/expertFeedSlice"
 import { Link, useNavigate } from "react-router-dom"
 import { Search, Filter, ArrowLeft, Briefcase } from "lucide-react"
 import { setInteractions } from "../utils/interactionSlice"
+import { handleAxiosError } from "../utils/handleAxiosError"
 
 const ExpertFeed = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const expertFeed = useSelector((store) => store.expertFeed)
+  const expertFeed = useSelector((store) => store.expertFeed);
+  const userInteractions = useSelector((store) => store.userInteractions)
+
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedExpertise, setSelectedExpertise] = useState("")
-
-  useEffect(() => {
-    const getExperts = async () => {
-      try {
-        const res = await axios.get(`${BASE_URL}/expert-list/approved`, {
-          withCredentials: true,
-        })
-        dispatch(addExpertFeed(res?.data))
-      } catch (err) {
-        console.error(err)
-      } finally {
-        setLoading(false)
-      }
+  console.log(expertFeed)
+  const getExperts = async () => {
+    try {
+      const res = await axios.get(`${BASE_URL}/expert-list/approved`, {
+        withCredentials: true,
+      })
+      dispatch(addExpertFeed(res?.data))
+      
+    } catch (err) {
+      console.error(err)
+      handleAxiosError(err, {}, [], "expert-feed-error")
+    } finally {
+      setLoading(false)
     }
-    getExperts()
-  }, [dispatch])
-
+  }
+  
+  useEffect(() => {
+    if (!expertFeed || expertFeed.length === 0) {
+      getExperts()
+    } else {
+      setLoading(false)
+    }
+  }, [])
+  
   const fetchUserInteractions = async () => {
     try {
       const userInteractions = await axios.get(BASE_URL + "/user-interactions", { withCredentials: true })
       dispatch(setInteractions(userInteractions.data))
     } catch (err) {
       console.error("Error fetching interactions:", err)
+      handleAxiosError(err, {}, [], "user-interactions-error")
     }
   }
 
   useEffect(() => {
+     if (!userInteractions || userInteractions.length === 0) 
     fetchUserInteractions()
   }, [])
 
@@ -62,7 +74,7 @@ const ExpertFeed = () => {
 
     return matchesSearch && matchesExpertise
   })
-
+  
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 to-slate-900 pt-16 px-4 sm:px-6 py-12">
       <div className="max-w-7xl mx-auto">
@@ -145,7 +157,7 @@ const ExpertFeed = () => {
               <div className="w-12 h-12 rounded-full animate-spin absolute border-4 border-cyan-500 border-t-transparent"></div>
             </div>
           </div>
-        ) : expertFeed.length === 0 ? (
+        ) : expertFeed?.length === 0 ? (
           <div className="bg-slate-800 border border-slate-700 rounded-xl p-8 text-center">
             <Briefcase className="h-16 w-16 text-slate-600 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-slate-300 mb-2">No Experts Available</h3>

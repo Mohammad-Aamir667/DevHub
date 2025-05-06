@@ -19,7 +19,7 @@ const conversationsSlice = createSlice({
         addConversation:(state,action)=>{
             state.push(action.payload);
         },
-        removeConversations:()=>null,
+        removeConversations:()=>[],
     }
 });
 export const {setConversations,updateConversations,addConversation,removeConversations} = conversationsSlice.actions;

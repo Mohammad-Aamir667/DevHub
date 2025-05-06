@@ -7,14 +7,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addRequest, removeRequest } from '../utils/requestSlice';
 import { ArrowLeft, UserCircle, ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { handleAxiosError } from '../utils/handleAxiosError';
 
 const Requests = () => {
   const dispatch = useDispatch();
   const requests = useSelector((store) => store.requests);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
-  const reqLen = requests?.length || 0;
-
+  const [error, setError] = useState(false);
+  const [fetched, setFetched] = useState(false)
   const handleReviewRequest = async (status, _id, e) => {
     e.stopPropagation(); // Prevent triggering the parent onClick
     try {
@@ -22,8 +23,9 @@ const Requests = () => {
         withCredentials: true,
       });
       dispatch(removeRequest(_id));
+
     } catch (err) {
-      console.error("Error updating request:", err);
+      handleAxiosError(err, {}, [], "request-error")
     }
   };
 
@@ -34,19 +36,24 @@ const Requests = () => {
   const getRequests = async () => {
     setIsLoading(true);
     try {
+      setError(false) 
       const res = await axios.get(`${BASE_URL}/user/requests/received`, {
         withCredentials: true,
       });
       dispatch(addRequest(res.data?.connectionRequests));
     } catch (err) {
-      console.error("Error fetching requests:", err);
+      setError(true) 
+      handleAxiosError(err,{},[],"request-error")
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
+    if (!fetched && (!requests || requests.length === 0)){
     getRequests();
+   
+    }
   }, []);
 
   if (isLoading) {
@@ -56,7 +63,22 @@ const Requests = () => {
       </div>
     );
   }
-
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-950 to-slate-900 flex items-center justify-center px-4">
+        <div className="bg-slate-800 border border-slate-700 p-8 rounded-xl text-center max-w-md w-full">
+          <h2 className="text-xl font-semibold text-red-400 mb-2">Failed to load connection requests</h2>
+          <p className="text-slate-400 mb-4">Something went wrong while fetching your connection requests. Please try again.</p>
+          <button
+            onClick={getRequests}
+            className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-4 py-2 rounded-md font-medium hover:opacity-90 transition"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    )
+  }
   return (
     <div className="min-h-screen bg-gradient-to-b mt-14 from-slate-950 to-slate-900 pt-5 px-6 py-12">
       <div className="max-w-4xl mx-auto">

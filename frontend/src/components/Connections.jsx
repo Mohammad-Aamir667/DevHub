@@ -1,17 +1,19 @@
 "use client"
 
 import axios from "axios"
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { BASE_URL } from "../utils/constants"
 import { useDispatch, useSelector } from "react-redux"
 import { addConnections } from "../utils/connectionSlice"
 import { useNavigate } from "react-router-dom"
 import { ArrowLeft, UserCircle, ExternalLink } from 'lucide-react'
+import { handleAxiosError } from "../utils/handleAxiosError"
 
 const Connections = () => {
   const connections = useSelector((store) => store.connections)
   const navigate = useNavigate()
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
+  const [error, setError] = useState(false)
 
   const viewProfile = (connection) => {
     navigate(`/view-profile`, { state: { userProfile: connection } })
@@ -19,21 +21,40 @@ const Connections = () => {
 
   const getConnections = async () => {
     try {
+      setError(false) 
       const res = await axios.get(BASE_URL + "/user/connection", {
         withCredentials: true,
       })
       dispatch(addConnections(res?.data))
     } catch (err) {
       console.log(err.message)
+      setError(true) 
+      handleAxiosError(err, {},[],"connection-error-toast");
     }
   }
 
   useEffect(() => {
-    if (!connections) getConnections()
-  }, [connections])
+    if(!connections) 
+   getConnections()
+  }, [])
 
   if (!connections) return null
-
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-950 to-slate-900 flex items-center justify-center px-4">
+        <div className="bg-slate-800 border border-slate-700 p-8 rounded-xl text-center max-w-md w-full">
+          <h2 className="text-xl font-semibold text-red-400 mb-2">Failed to load connections</h2>
+          <p className="text-slate-400 mb-4">Something went wrong while fetching your connections. Please try again.</p>
+          <button
+            onClick={getConnections}
+            className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-4 py-2 rounded-md font-medium hover:opacity-90 transition"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    )
+  }
   return (
     <div className="min-h-screen bg-gradient-to-b mt-14 from-slate-950 to-slate-900 pt-5 px-6 py-12">
       <div className="max-w-4xl mx-auto">

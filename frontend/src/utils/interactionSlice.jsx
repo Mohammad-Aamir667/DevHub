@@ -6,7 +6,7 @@ const interactionsSlice = createSlice({
     reducers: {
       setInteractions: (state, action) => {
         return action.payload;
-       
+        
       },
       addInteraction: (state, action) => {
         state.push(action.payload);

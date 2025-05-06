@@ -4,7 +4,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addUser } from '../utils/userSlice';
 import { useNavigate } from 'react-router-dom';
 import { BASE_URL } from '../utils/constants';
-import { setInteractions } from '../utils/interactionSlice';
+import { handleAxiosError } from '../utils/handleAxiosError';
+
 
 const Login = () => {
   const [emailId, setEmailId] = useState("ayat123@gmail.com");
@@ -15,6 +16,8 @@ const Login = () => {
   const [password, setPassword] = useState("Ayat@123");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [passwordMatchError, setPasswordMatchError] = useState(false);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((store) => store.user);
@@ -24,6 +27,20 @@ const Login = () => {
     }
   }, [user, navigate]);
   const handleLogin = async () => {
+    if (!emailId && !password) {
+      setError("Email and password are required");
+      return;
+    } else if (!emailId) {
+      setError("Email is required");
+      return;
+    } else if (!password) {
+      setError("Password is required");
+      return;
+    } else {
+      setError(""); 
+    }
+    
+    
     setLoading(true);
     try {
       const res = await axios.post(BASE_URL + "/login", {
@@ -34,31 +51,71 @@ const Login = () => {
       navigate("/");
     } catch (err) {
       console.log(err);
+      if (err?.response?.status === 401 || err?.response?.status === 400) 
       setError(err?.response?.data);
+       else {
+        handleAxiosError(err, {}, [400, 401], "login-error-toast");
+      }
     } finally {
       setLoading(false);
     }
   };
+  useEffect(() => {
+      if(!password.startsWith(confirmPassword)){
+        setPasswordMatchError(true);
+    } 
+    else{
+      setPasswordMatchError(false);
+    }
+  }, [password, confirmPassword]);
 
   const handleSignUp = async () => {
-    if (password !== confirmPassword) {
-      setError("Password and Confirm Password do not match");
+    if (!firstName && !lastName && !emailId && !password && !confirmPassword) {
+      setError("All fields are required");
       return;
+    } else if (!firstName) {
+      setError("First name is required");
+      return;
+    } else if (!lastName) {
+      setError("Last name is required");
+      return;
+    } else if (!emailId) {
+      setError("Email is required");
+      return;
+    } else if (!password) {
+      setError("Password is required");
+      return;
+    } else if (!confirmPassword) {
+      setError("Confirm password is required");
+      return;
+    } else {
+      setError("");
+    }
+    
+    
+    if(password !== confirmPassword) {
+      return; 
     }
     setLoading(true);
     try {
       const res = await axios.post(BASE_URL + "/signup", {
-        firstName,
+       firstName: firstName.trim(),
         lastName,
-        emailId,
+        emailId:emailId.trim(),
         password,
       }, { withCredentials: true });
       dispatch(addUser(res.data));
       navigate("/profile");
     } catch (err) {
-      console.log(err.message);
+      console.log(err);
+      if (err?.response?.status === 401 || err?.response?.status === 400) 
+      setError(err?.response?.data);
+       else {
+        handleAxiosError(err, {}, [400, 401], "signup-error-toast");
+      }
     } finally {
       setLoading(false);
+      
     }
   };
 
@@ -117,21 +174,24 @@ const Login = () => {
               <input
                 type="password"
                 value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+
+                onChange={(e) => {setConfirmPassword(e.target.value)}
+                }
                 placeholder="Confirm Password"
                 className="input input-bordered w-full bg-gray-700 text-soft-white"
               />
             </label>
           )}
-          {confirmPassword !== "" && password !== confirmPassword && (
-            <p className="text-red-500 mb-4">Password does not match</p>
-          )}
+       {passwordMatchError && (
+  <p className="text-red-500 text-sm mt-1">Passwords do not match</p>
+)}
           <p className="text-red-500 mb-4">{error}</p>
           <div className="card-actions justify-center mt-6">
             <button
               onClick={isLoginForm ? handleLogin : handleSignUp}
               className="btn bg-vibrant-clay hover:bg-orange-600 text-soft-white w-full"
-              disabled={loading}
+              disabled={loading || (!isLoginForm && passwordMatchError)}
+
             >
               {loading ? "Processing..." : isLoginForm ? "Login" : "Sign Up"}
             </button>

@@ -24,17 +24,21 @@ import ExpertOverView from "./components/ExpertOverView"
 import ViewRequests from "./components/ViewRequests"
 import Notifications from "./components/Notifications"
 import CreateGroupChat from "./components/CreateGroupChat"
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   
   return (
     <> 
     <div className="min-h-screen">
+    <ToastContainer />
     <Provider store = {appStore}>
+   
     <BrowserRouter basename="/">
      <Routes>
     
-     
+  
       <Route path ="/" element={<Body/>}>
       <Route path = "/login"element={<Login/>}></Route>
       <Route path ="/" element ={<Feed/>}></Route>

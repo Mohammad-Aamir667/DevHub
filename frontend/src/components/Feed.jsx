@@ -7,6 +7,7 @@ import { BASE_URL } from "../utils/constants"
 import { addFeed } from "../utils/feedSlice"
 import FeedCard from "./FeedCard"
 import { Loader2, Search } from "lucide-react"
+import { handleAxiosError } from "../utils/handleAxiosError"
 
 const Feed = () => {
   const dispatch = useDispatch()
@@ -16,9 +17,11 @@ const Feed = () => {
   const [page, setPage] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
   const [hasMore, setHasMore] = useState(true)
-
+   const [error, setError] = useState(false)
+  
   const getFeed = async (page) => {
     try {
+      setError(false) 
       setIsLoading(true)
       const res = await axios.get(`${BASE_URL}/feed?page=${page}`, {
         withCredentials: true,
@@ -30,7 +33,8 @@ const Feed = () => {
         setHasMore(false)
       }
     } catch (err) {
-      console.error(err)
+     setError(true) 
+           handleAxiosError(err, {},[],"connection-error-toast");
     } finally {
       setIsLoading(false)
     }
@@ -62,6 +66,22 @@ const Feed = () => {
       (value) => typeof value === "string" && value.toLowerCase().includes(searchTerm.toLowerCase()),
     ),
   )
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-950 to-slate-900 flex items-center justify-center px-4">
+        <div className="bg-slate-800 border border-slate-700 p-8 rounded-xl text-center max-w-md w-full">
+          <h2 className="text-xl font-semibold text-red-400 mb-2">Failed to load feed</h2>
+          <p className="text-slate-400 mb-4">Something went wrong while fetching your feed. Please try again.</p>
+          <button
+            onClick={getFeed}
+            className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-4 py-2 rounded-md font-medium hover:opacity-90 transition"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gray-900 py-8 px-4 sm:px-6 mt-5 lg:px-8">
