@@ -15,7 +15,6 @@ const Requests = () => {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const [error, setError] = useState(false);
-  const [fetched, setFetched] = useState(false)
   const handleReviewRequest = async (status, _id, e) => {
     e.stopPropagation(); // Prevent triggering the parent onClick
     try {
@@ -50,7 +49,8 @@ const Requests = () => {
   };
 
   useEffect(() => {
-    if (!fetched && (!requests || requests.length === 0)){
+  // if (!requests)
+  {
     getRequests();
    
     }
