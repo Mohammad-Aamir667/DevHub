@@ -109,7 +109,7 @@ authRouter.post("/forget-password",async(req,res)=>{
         service: 'Gmail', 
         auth: {
           user: 'aamireverlasting786@gmail.com',  
-          pass: 'vlry sqds golz ocbt',
+          pass: 'mafg qzfv vave hixh',
         },
       });
       await transporter.sendMail({
