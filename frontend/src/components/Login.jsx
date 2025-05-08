@@ -8,12 +8,12 @@ import { handleAxiosError } from '../utils/handleAxiosError';
 
 
 const Login = () => {
-  const [emailId, setEmailId] = useState("ayat@123");
+  const [emailId, setEmailId] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoginForm, setIsLoginForm] = useState(true);
-  const [password, setPassword] = useState("Ayat@123");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [passwordMatchError, setPasswordMatchError] = useState(false);
