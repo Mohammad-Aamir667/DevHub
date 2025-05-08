@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import NavBar from './NavBar'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import axios from 'axios'
@@ -14,6 +14,8 @@ const Body = () =>{
   const location = useLocation();
   const user = useSelector((store)=>store.user);
   const expertDetails = useSelector((store) => store.expertDetails)
+  const [loading, setLoading] = useState(true); 
+
   const hideTopNavBarPaths = ["/chat-list","/chat-box","/expert-dashboard"];
   const shouldTopHideNavBar = hideTopNavBarPaths.some((path)=>
     location.pathname.startsWith(path.replace(":id",""))
@@ -31,14 +33,15 @@ const Body = () =>{
     dispatch(addUser(res.data));
     
        }
-       catch(err){
-        console.log(err)
-       if(err.status === 401){
-        navigate("/login"); 
-       }
-     
-else alert(err.response?.data)
-       }
+       catch (err) {
+        if (err?.response?.status === 401) {
+          navigate("/login");
+        } else {
+          console.log("Fetch user error", err);
+        }
+      } finally {
+        setLoading(false); // stop loading regardless
+      }
   }
   const handleExpert = async ()=>{
     try{
@@ -53,12 +56,13 @@ else alert(err.response?.data)
   }
   
 
-useEffect(()=>{
-  if(!user)
-  fetchUser();
- if(expertDetails.expertId === null )
-   handleExpert();
-},[user]);
+  useEffect(() => {
+    if (!user) fetchUser();
+    else setLoading(false); // in case redux already has user
+    if (expertDetails.expertId === null) handleExpert();
+  }, []);
+
+  if (loading) return <div className="p-4 text-center">Loading...</div>;
 
  
   return (
