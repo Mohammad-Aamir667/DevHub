@@ -34,7 +34,7 @@ const Feed = () => {
       }
     } catch (err) {
      setError(true) 
-           handleAxiosError(err, {},[],"connection-error-toast");
+           handleAxiosError(err, {},[401],"connection-error-toast");
     } finally {
       setIsLoading(false)
     }
