@@ -1,4 +1,5 @@
 const express = require("express");
+require("dotenv").config()
 const crypto = require("crypto");
 const validator = require("validator");
 const { validateSignUpData } = require("../utils/validation");
@@ -7,6 +8,7 @@ const authRouter = express.Router();
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const { userAuth } = require("../middlewares/auth");
+
 authRouter.post("/signup", async (req, res) => {
   try {
     validateSignUpData(req);
@@ -107,7 +109,7 @@ authRouter.post("/forget-password",async(req,res)=>{
         service: 'Gmail', 
         auth: {
           user: 'aamireverlasting786@gmail.com',  
-          pass: process.env.GMAIL_PASS_KEY , 
+          pass: 'vlry sqds golz ocbt',
         },
       });
       await transporter.sendMail({

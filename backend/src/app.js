@@ -11,7 +11,7 @@ const socketManager =   require('./sockets/index');
 
 const allowedOrigins = [
   "https://dev-hub-one.vercel.app",
-  "http://localhost:5173"
+  //"http://localhost:5173"
 ];
 
 app.use(cors({
