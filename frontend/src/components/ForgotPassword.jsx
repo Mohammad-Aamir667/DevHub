@@ -3,6 +3,7 @@ import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react"
+import toast from "react-hot-toast";
 
 const ForgotPassword = () => {
   const [emailId, setEmailId] = useState("");
@@ -33,11 +34,14 @@ const ForgotPassword = () => {
         { withCredentials: true }
       );
       setMessage(res.data.message);
+      toast.success(res.data.message);
       setOtpSent(true);
       setShowToast(true);
       setError("");
     } catch (err) {
       setError(err?.response?.data?.message || "Something went wrong");
+      toast.error(err?.response?.data?.message || "Something went wrong");  // ✅ Show error toast
+
       setMessage("");
     } finally {
       setLoading(false);
@@ -102,7 +106,9 @@ const ForgotPassword = () => {
           <div className="fixed top-5 left-1/2 transform -translate-x-1/2 bg-green-600 text-soft-white px-4 py-2 rounded-lg shadow-md">
             {message}
           </div>
+          
         )}
+
       </div>
     </div>
   );
