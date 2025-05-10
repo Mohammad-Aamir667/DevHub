@@ -12,13 +12,11 @@ import { handleAxiosError } from "../utils/handleAxiosError"
 const Feed = () => {
   const dispatch = useDispatch()
   const feedUsers = useSelector((store) => store.feed)
-
   const [searchTerm, setSearchTerm] = useState("")
   const [page, setPage] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
   const [hasMore, setHasMore] = useState(true)
-   const [error, setError] = useState(false)
-  
+  const [error, setError] = useState(false)
   const getFeed = async (page) => {
     try {
       setError(false) 
@@ -26,7 +24,6 @@ const Feed = () => {
       const res = await axios.get(`${BASE_URL}/feed?page=${page}`, {
         withCredentials: true,
       })
-
       if (res?.data?.length > 0) {
         dispatch(addFeed(res.data))
       } else {
@@ -34,7 +31,7 @@ const Feed = () => {
       }
     } catch (err) {
      setError(true) 
-           handleAxiosError(err, {},[401],"connection-error-toast");
+           handleAxiosError(err, {},[],"connection-error-toast");
     } finally {
       setIsLoading(false)
     }
@@ -45,7 +42,7 @@ const Feed = () => {
       getFeed(page)
     }
   }, [page, hasMore])
-
+ 
   const handleScroll = () => {
     if (
       window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight - 50 &&
@@ -53,7 +50,9 @@ const Feed = () => {
       hasMore
     ) {
       setPage((prevPage) => prevPage + 1)
+      console.log(page);
     }
+   
   }
 
   useEffect(() => {

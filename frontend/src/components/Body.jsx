@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { addUser } from '../utils/userSlice'
 import BottomNavigation from './BottomNav'
 import { updateExpertStatus } from '../utils/expertDetailsSlice';
+import { Loader2 } from 'lucide-react'
 
 const Body = () =>{
   const dispatch = useDispatch();
@@ -62,8 +63,11 @@ const Body = () =>{
     if (expertDetails.expertId === null) handleExpert();
   }, []);
 
-  if (loading) return <div className="p-4 text-center">Loading...</div>;
-
+  if (loading)  return  ( <div className="text-center py-8 flex flex-col items-center">
+  <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+  <p className="mt-3 text-gray-300 font-medium">Loading...</p>
+</div>
+)
  
   return (
     <div>
