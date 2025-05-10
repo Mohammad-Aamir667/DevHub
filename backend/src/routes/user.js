@@ -57,8 +57,10 @@ userRouter.get("/feed",userAuth,async (req,res)=>{
                hideUsersFromFeed.add(req.fromUserId.toString());
                hideUsersFromFeed.add(req.toUserId.toString());
       });
-      const page = parseInt(req.params.page)||1;
-      let limit = parseInt(req.params.limit) || 10;
+      console.log(req.query);
+      const page = parseInt(req.query.page)||1;
+     
+      let limit = parseInt(req.query.limit) || 10;
        limit = limit>10?10:limit;
        const skip = (page-1)*limit;
       const users = await User.find({
