@@ -2,8 +2,7 @@ import React from "react";
 
 const ExpertCardList = ({ experts, onExpertClick }) => {
   if (!experts || experts.length === 0) {
-      console.log(experts)
-    return (
+        return (
       <p className="text-gray-500 text-center mt-4">
         No experts available in this category.
       </p>

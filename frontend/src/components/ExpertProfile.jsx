@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router-dom"
 import { ArrowLeft, FileText } from 'lucide-react';
 const ExpertProfile = () => {
   const expert = useSelector((state) => state.expertDetails);
-  console.log(expert);
+ 
   const user = useSelector((state) => state.user)
   const navigate = useNavigate()
 

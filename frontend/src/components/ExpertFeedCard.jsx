@@ -4,7 +4,6 @@ import { Star, Clock, Calendar, ExternalLink } from "lucide-react"
 import { Link } from "react-router-dom"
 
 const ExpertFeedCard = ({ expertDetails }) => {
-  console.log(expertDetails)
   const {
     expertise = [],
     experienceYears,

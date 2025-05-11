@@ -10,7 +10,6 @@ import {  updateExpertStatus } from "../utils/expertDetailsSlice"
 
 const EditExpertProfile = () => {
   const expert = useSelector((state) => state.expertDetails);
-  console.log(expert);
   const user = useSelector((state) => state.user)
   const navigate = useNavigate()
 

@@ -52,7 +52,7 @@ const NavBar = () => {
           {user && (
             <div className="flex items-center space-x-4">
           
-              {/* Dropdown Button & Menu */}
+            
              <div className="dropdown dropdown-end">
   <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
     <div className="w-10 rounded-full">

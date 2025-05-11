@@ -50,7 +50,6 @@ const Feed = () => {
       hasMore
     ) {
       setPage((prevPage) => prevPage + 1)
-      console.log(page);
     }
    
   }

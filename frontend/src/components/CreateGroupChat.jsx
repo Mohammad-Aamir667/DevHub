@@ -47,7 +47,6 @@ const CreateGroupChat = () => {
 
     try {
       const participantIds = selectedParticipants.map((p) => p._id)
-      console.log(participantIds);
       const res = await axios.post(
         BASE_URL + "/create-group-chat",
         { participantIds, groupName },

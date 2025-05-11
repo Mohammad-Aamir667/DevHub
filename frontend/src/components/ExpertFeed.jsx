@@ -20,7 +20,6 @@ const ExpertFeed = () => {
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedExpertise, setSelectedExpertise] = useState("")
-  console.log(expertFeed)
   const getExperts = async () => {
     try {
       const res = await axios.get(`${BASE_URL}/expert-list/approved`, {
