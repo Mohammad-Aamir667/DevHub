@@ -15,6 +15,7 @@ const Body = () =>{
   const location = useLocation();
   const user = useSelector((store)=>store.user);
   const expertDetails = useSelector((store) => store.expertDetails)
+  console.log(expertDetails);
   const [loading, setLoading] = useState(true); 
 
   const hideTopNavBarPaths = ["/chat-list","/chat-box","/expert-dashboard"];
@@ -41,7 +42,7 @@ const Body = () =>{
           console.log("Fetch user error", err);
         }
       } finally {
-        setLoading(false); // stop loading regardless
+        setLoading(false); 
       }
   }
   const handleExpert = async ()=>{
@@ -57,11 +58,20 @@ const Body = () =>{
   }
   
 
-  useEffect(() => {
-    if (!user) fetchUser();
-    else setLoading(false); // in case redux already has user
-    if (expertDetails.expertId === null) handleExpert();
-  }, []);
+ useEffect(() => {
+  if (user) {
+    handleExpert();
+  }
+}, [user]);
+
+useEffect(() => {
+  if (!user) {
+    fetchUser();
+  } else {
+    setLoading(false);
+  }
+}, []);
+
 
   if (loading)  return  ( <div className="text-center py-8 flex flex-col items-center">
   <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
