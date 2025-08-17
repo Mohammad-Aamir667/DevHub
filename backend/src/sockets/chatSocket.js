@@ -4,18 +4,11 @@ const Message = require("../models/message");
 const User = require("../models/user");
 
 const chatSocket = (io, socket, socketUserMap) => {
-  
-
   socket.on("joinRoom", (roomId) => {
     socket.join(roomId);
-    
   });
-  
-  
-
   socket.on("leaveRoom", (roomId) => {
     socket.leave(roomId);
-    
   });
   socket.on("sendMessage", async (data) => {
   try{
@@ -23,7 +16,16 @@ const chatSocket = (io, socket, socketUserMap) => {
     if(data.conversationId){
       const conversation = await Conversation.findById(data.conversationId);
     if (!conversation) return;
-    const { fromUserId, conversationId, messageText, file, fileUrl, timestamp } = data;
+        const { fromUserId, conversationId, messageText, file, fileUrl, timestamp } = data;
+
+     const isParticipant = conversation.participants.some(
+        (id) => id.toString() === fromUserId.toString()
+      );
+
+      if (!isParticipant) {
+        console.warn("Unauthorized message attempt by:", fromUserId);
+        return; 
+      }
     const message = new Message({
       fromUserId,
       messageText,
