@@ -62,11 +62,12 @@ const Chat = () => {
       setChatHistory((prev) => [...prev, message])
       scrollToBottom()
     })
-      dispatch(updateConversations({
-      id: groupChat ? groupId : message.fromUserId._id,
-      lastMessage: message.messageText || "📎 File",
-      timestamp: message.timestamp
-    }))
+     dispatch(updateConversations({
+  id: groupChat ? groupId : message.fromUserId?._id,
+  lastMessage: message.messageText || "📎 File",
+  timestamp: message.timestamp || Date.now()
+}))
+
   
 
 
@@ -111,9 +112,9 @@ const Chat = () => {
 
       setChatHistory((prev) => [...prev, newMessage])
       socket.emit("sendMessage", newMessage)
-      dispatch(updateConversations({
+  dispatch(updateConversations({
   id: groupChat ? groupId : toUserId,
-  lastMessage: messageText || "📎 File",
+  lastMessage: messageText?.trim() || "📎 File",
   timestamp: Date.now()
 }))
 
@@ -143,7 +144,7 @@ const Chat = () => {
     socket.emit("sendMessage", newMessage)
     dispatch(updateConversations({
   id: groupChat ? groupId : toUserId,
-  lastMessage: messageText || "📎 File",
+  lastMessage: messageText?.trim() || "📎 File",
   timestamp: Date.now()
 }))
 
