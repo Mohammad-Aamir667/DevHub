@@ -17,9 +17,9 @@ const chatSocket = (io, socket, socketUserMap) => {
       const conversation = await Conversation.findById(data.conversationId);
     if (!conversation) return;
         const { fromUserId, conversationId, messageText, file, fileUrl, timestamp } = data;
-
+        if(messageText.trim() === "" && !file) return; // Ignore empty messages
      const isParticipant = conversation.participants.some(
-        (id) => id.toString() === fromUserId.toString()
+        (id) => id.toString() === fromUserId._id.toString()
       );
 
       if (!isParticipant) {
@@ -49,6 +49,7 @@ const chatSocket = (io, socket, socketUserMap) => {
       const message = new Message({
         fromUserId,
         messageText,
+        //may be a new conversation
         conversation: null,
         file,
         fileUrl,
