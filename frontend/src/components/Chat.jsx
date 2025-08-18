@@ -130,7 +130,7 @@ const Chat = () => {
   }
 
   const handleSendMessage = () => {
-    if (!messageText.trim() && !fileUrl) return
+    if (!messageText.trim() && !fileUrl) return;
 
     const newMessage = {
       fromUserId: { _id: fromUserId, firstName: loggedInUser?.firstName, lastName: loggedInUser?.lastName },
