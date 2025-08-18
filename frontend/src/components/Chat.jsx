@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState, useRef } from "react"
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { useLocation, useNavigate } from "react-router-dom"
 import { io } from "socket.io-client"
 import { BASE_URL } from "../utils/constants"
@@ -21,8 +21,9 @@ const Chat = () => {
   const [isSendingFile, setIsSendingFile] = useState(false);
   const chatContainerRef = useRef(null)
   const inputRef = useRef(null)
+  const dispatch = useDispatch()
 
-  const { chatUser, groupChat } = location.state
+  const { chatUser, groupChat } = location?.state
   const loggedInUser = useSelector((store) => store.user)
   const fromUserId = loggedInUser?._id
 
