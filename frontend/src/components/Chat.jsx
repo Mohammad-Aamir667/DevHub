@@ -8,6 +8,7 @@ import { BASE_URL } from "../utils/constants"
 import axios from "axios"
 import RenderFiles from "./RenderFiles"
 import { ArrowLeft, Paperclip, Send, User, Loader2 } from "lucide-react"
+import { updateConversations } from "../utils/conversationsSlice"
 
 const socket = io(BASE_URL)
 
@@ -60,6 +61,13 @@ const Chat = () => {
       setChatHistory((prev) => [...prev, message])
       scrollToBottom()
     })
+      dispatch(updateConversations({
+      id: groupChat ? groupId : message.fromUserId._id,
+      lastMessage: message.messageText || "📎 File",
+      timestamp: message.timestamp
+    }))
+  
+
 
     return () => socket.off("receiveMessage")
   }, [])
@@ -102,6 +110,12 @@ const Chat = () => {
 
       setChatHistory((prev) => [...prev, newMessage])
       socket.emit("sendMessage", newMessage)
+      dispatch(updateConversations({
+  id: groupChat ? groupId : toUserId,
+  lastMessage: messageText || "📎 File",
+  timestamp: Date.now()
+}))
+
       setFile(null)
     } catch (err) {
       console.log(err.message)
@@ -126,6 +140,11 @@ const Chat = () => {
 
     setChatHistory((prev) => [...prev, newMessage])
     socket.emit("sendMessage", newMessage)
+    dispatch(updateConversations({
+  id: groupChat ? groupId : toUserId,
+  lastMessage: messageText || "📎 File",
+  timestamp: Date.now()
+}))
 
     setMessageText("")
     setFileUrl("")
