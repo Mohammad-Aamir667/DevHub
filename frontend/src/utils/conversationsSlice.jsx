@@ -9,11 +9,24 @@ const conversationsSlice = createSlice({
            return action.payload;
     },
      updateConversations: (state, action) => {
+        console.log("Updating conversation:", action.payload);
   const { id, lastMessage, timestamp } = action.payload
-  const index = state.findIndex((convo) => convo._id === id)
+
+      
+  let index = -1
+
+    index = state.findIndex((convo) => convo._id === id)
+   if(index === -1){
+    index = state.findIndex(
+      (convo) =>
+        convo.conversationType === "user-user" &&
+        convo.participants.some((p) => p._id === id)
+    )
+}
+ console.log("Index after check:", index);
   if (index !== -1) {
-    state[index].lastMessage = lastMessage || state[index].lastMessage || ""
-    state[index].timestamp = timestamp || state[index].timestamp || null
+    state[index].lastMessage.messageText = lastMessage || state[index].lastMessage || ""
+    state[index].lastMessage.timestamp = timestamp || state[index].timestamp || null
   }
 },
 
