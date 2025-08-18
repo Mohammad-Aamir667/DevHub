@@ -9,7 +9,6 @@ const conversationsSlice = createSlice({
            return action.payload;
     },
      updateConversations: (state, action) => {
-        console.log("Updating conversation:", action.payload);
   const { id, lastMessage, timestamp } = action.payload
 
       
@@ -23,7 +22,6 @@ const conversationsSlice = createSlice({
         convo.participants.some((p) => p._id === id)
     )
 }
- console.log("Index after check:", index);
   if (index !== -1) {
     state[index].lastMessage.messageText = lastMessage || state[index].lastMessage || ""
     state[index].lastMessage.timestamp = timestamp || state[index].timestamp || null
