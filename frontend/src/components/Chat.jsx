@@ -58,21 +58,21 @@ const Chat = () => {
   }, [groupChat, groupId, toUserId])
 
   useEffect(() => {
-    socket.on("receiveMessage", (message) => {
-      setChatHistory((prev) => [...prev, message])
-      scrollToBottom()
-    })
-     dispatch(updateConversations({
-  id: groupChat ? groupId : message.fromUserId?._id,
-  lastMessage: message.messageText || "📎 File",
-  timestamp: message.timestamp || Date.now()
-}))
+  socket.on("receiveMessage", (message) => {
+    setChatHistory((prev) => [...prev, message])
+    scrollToBottom()
 
-  
+    dispatch(updateConversations({
+      id: groupChat ? groupId : message.fromUserId?._id,
+      lastMessage: message.messageText || "📎 File",
+      timestamp: message.timestamp || Date.now()
+    }))
+  })
 
-
-    return () => socket.off("receiveMessage")
-  }, [])
+  return () => {
+    socket.off("receiveMessage")
+  }
+}, [groupChat, groupId, dispatch])
 
   const scrollToBottom = () => {
     if (chatContainerRef.current) {
