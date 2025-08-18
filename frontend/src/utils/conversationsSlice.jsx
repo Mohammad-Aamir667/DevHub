@@ -8,14 +8,15 @@ const conversationsSlice = createSlice({
         setConversations:(state,action)=>{
            return action.payload;
     },
-        updateConversations:(state,action)=>{
-            const {id,lastMessage,timestamp} = action.payload;
-            const index = state.findIndex((convo)=>convo._id === id);
-            if(index !== -1){
-                state[index].lastMessage = lastMessage;
-                state[index].timestamp = timestamp;
-      }
-        },
+     updateConversations: (state, action) => {
+  const { id, lastMessage, timestamp } = action.payload
+  const index = state.findIndex((convo) => convo._id === id)
+  if (index !== -1) {
+    state[index].lastMessage = lastMessage || state[index].lastMessage || ""
+    state[index].timestamp = timestamp || state[index].timestamp || null
+  }
+},
+
         addConversation:(state,action)=>{
             state.push(action.payload);
         },
