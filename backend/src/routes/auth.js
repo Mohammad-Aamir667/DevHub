@@ -104,6 +104,7 @@ authRouter.post("/forget-password",async(req,res)=>{
       }
       const otp = crypto.randomInt(100000,999999);
       const otpExpireTime = 10*60*1000;
+
       user.resetPasswordOTP = otp;
       user.resetPasswordOTPExpires = Date.now() +  otpExpireTime;
       await user.save();
@@ -114,10 +115,49 @@ authRouter.post("/forget-password",async(req,res)=>{
           pass: process.env.GMAIL_PASS_KEY,
         },
       });
+    const htmlTemplet=  `
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Password Reset OTP</title>
+  </head>
+  <body style="font-family: Arial, sans-serif; background-color: #f4f4f7; margin: 0; padding: 0;">
+    <table role="presentation" style="max-width: 600px; margin: 30px auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+      <tr>
+        <td style="background: #4f46e5; padding: 20px; text-align: center;">
+          <h1 style="color: #ffffff; margin: 0;">Password Reset</h1>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding: 20px; color: #333333;">
+          <p>Hello,</p>
+          <p>You requested to reset your password. Use the OTP below to proceed:</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <span style="font-size: 28px; font-weight: bold; color: #4f46e5; letter-spacing: 3px; border: 2px dashed #4f46e5; padding: 12px 24px; border-radius: 6px; display: inline-block;">
+              ${otp}
+            </span>
+          </div>
+          <p>This OTP is valid for <strong>10 minutes</strong>. Please do not share it with anyone.</p>
+          <p>If you did not request this, you can safely ignore this email.</p>
+          <p style="margin-top: 40px;">Thanks,<br/>The Support Team</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="background: #f9fafb; padding: 15px; text-align: center; font-size: 12px; color: #999999;">
+          © ${new Date().getFullYear()} Your App Name. All rights reserved.
+        </td>
+      </tr>
+    </table>
+  </body>
+  </html>
+`
+
       await transporter.sendMail({
           to:emailId,
-          subject:"password reset otp",
-          text:`Your OTP is ${otp}`
+          subject:"Password Reset OTP - GrievincePro",
+        html:htmlTemplet,
       });
      return res.json({
         message:"Otp sent to your email",
