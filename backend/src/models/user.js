@@ -65,12 +65,19 @@ const userSchema = new mongoose.Schema({
         }
     }
     },
-    otp:{
+    resetPasswordOTP:{
         type:Number,
     },
-    otpExpires:{
+    resetPasswordOTPExpires:{
           type:Date,
-    }
+    },
+     signupOTP:{
+        type:Number,
+    },
+    signupOTPOTPExpires:{
+          type:Date,
+    },
+    
 },{timestamps:true});
 userSchema.methods.getJWT = async function(){
     const user  = this;
