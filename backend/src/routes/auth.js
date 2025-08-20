@@ -9,7 +9,7 @@ const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const { userAuth } = require("../middlewares/auth");
 
-authRouter.post("/signup", async (req, res) => {
+authRouter.post("/signup", async (req, res) => {   
   try {
     validateSignUpData(req);
 
@@ -54,6 +54,9 @@ authRouter.post("/signup", async (req, res) => {
 authRouter.post("/login",async (req,res)=>{
     try{ 
          const {emailId,password} = req.body;
+        if(!emailId || !password){ 
+          return res.status(400).send("emailId and password are required");
+        }
       const user = await User.findOne({emailId});
       if(!user){
        return res.status(401).send("Invalid credentials");
@@ -68,9 +71,8 @@ authRouter.post("/login",async (req,res)=>{
             res.cookie("token", token, {
               httpOnly: true,
               secure: true,  // ✅ Required for HTTPS (Render & Vercel)
-              sameSite: "none",  // ✅ Allow cross-origin cookies
+              sameSite: "none",  
             });
-        res.cookie("token",token);
         res.json(userData);
     }
     catch (err) {
@@ -102,14 +104,14 @@ authRouter.post("/forget-password",async(req,res)=>{
       }
       const otp = crypto.randomInt(100000,999999);
       const otpExpireTime = 10*60*1000;
-      user.otp = otp;
-      user.otpExpires = Date.now() +  otpExpireTime;
+      user.resetPasswordOTP = otp;
+      user.resetPasswordOTPExpires = Date.now() +  otpExpireTime;
       await user.save();
       const transporter = nodemailer.createTransport({
         service: 'Gmail', 
         auth: {
           user: 'aamireverlasting786@gmail.com',  
-          pass: 'mafg qzfv vave hixh',
+          pass: process.env.GMAIL_PASS_KEY,
         },
       });
       await transporter.sendMail({
@@ -136,12 +138,12 @@ authRouter.post("/reset-password",async(req,res)=>{
           return res.status(400).json({
             message:'user not found'});
          }
-          if(user.otp !== parseInt(otp)){
+          if(user.resetPasswordOTP !== parseInt(otp)){
                 return res.status(400).json({
                   message:"invalid OTP"
                  })            
           }
-          if(Date.now()>user.otpExpires){
+          if(Date.now()>user.resetPasswordOTPExpires){
            return res.status(400).json({
               message:"OTP expired"
             })
@@ -153,8 +155,8 @@ authRouter.post("/reset-password",async(req,res)=>{
        }
        const newPasswordHash = await bcrypt.hash(newPassword,10);
        user.password = newPasswordHash;
-       user.otp = null;
-       user.otpExpires = null;
+       user.resetPasswordOTP = null;
+       user.resetPasswordOTPExpires = null;
        await user.save();
      return  res.json({
         message:"password reset successfully"
