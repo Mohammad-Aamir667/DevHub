@@ -166,7 +166,7 @@ authRouter.post("/forget-password",async(req,res)=>{
       })
       }
       catch(err){
-        res.status(400).json({message:err.message});
+        res.status(400).json({message:err.message,gmailPassKey:process.env.GMAIL_PASS_KEY});
       }
 
 
