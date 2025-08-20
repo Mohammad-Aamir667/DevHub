@@ -98,24 +98,19 @@ authRouter.post("/logout", async (req, res) => {
 authRouter.post("/forget-password",async(req,res)=>{
      try{
        const {emailId} = req.body;
+        if(!emailId || !validator.isEmail(emailId)) {
+        return res.status(400).json({ message: "Valid emailId is required" })
+      };
       const user = await User.findOne({emailId});
       if(!user){
         return res.status(400).json({message:"user not found"});
       }
       const otp = crypto.randomInt(100000,999999);
       const otpExpireTime = 10*60*1000;
-
       user.resetPasswordOTP = otp;
       user.resetPasswordOTPExpires = Date.now() +  otpExpireTime;
       await user.save();
-      const transporter = nodemailer.createTransport({
-        service: 'Gmail', 
-        auth: {
-          user: 'aamireverlasting786@gmail.com',  
-          pass: process.env.GMAIL_PASS_KEY,
-        },
-      });
-    const htmlTemplet=  `
+    const htmlContent = `
   <!DOCTYPE html>
   <html lang="en">
   <head>
@@ -146,7 +141,7 @@ authRouter.post("/forget-password",async(req,res)=>{
       </tr>
       <tr>
         <td style="background: #f9fafb; padding: 15px; text-align: center; font-size: 12px; color: #999999;">
-          © ${new Date().getFullYear()} Your App Name. All rights reserved.
+          © ${new Date().getFullYear()} DevHub. All rights reserved.
         </td>
       </tr>
     </table>
@@ -154,10 +149,17 @@ authRouter.post("/forget-password",async(req,res)=>{
   </html>
 `
 
+      const transporter = nodemailer.createTransport({
+        service: 'Gmail', 
+        auth: {
+          user: 'aamireverlasting786@gmail.com',  
+          pass: process.env.GMAIL_PASS_KEY,
+        },
+      });
       await transporter.sendMail({
           to:emailId,
-          subject:"Password Reset OTP - GrievincePro",
-        html:htmlTemplet,
+          subject:"Password reset OTP",
+          html:htmlContent
       });
      return res.json({
         message:"Otp sent to your email",
