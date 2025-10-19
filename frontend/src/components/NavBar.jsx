@@ -45,12 +45,11 @@ const NavBar = () => {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <Link
-              to={user ? "/" : "/"} // still using "/" because the path is same
+              to={user ? "/" : "/"}
               onClick={(e) => {
                 if (!user) {
-                  // force top-level navigation for unauthenticated users
                   e.preventDefault();
-                  navigate("/", { replace: true });
+                  navigate("/");
                 }
               }}
               className="flex items-center space-x-2"
