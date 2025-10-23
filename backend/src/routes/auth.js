@@ -9,7 +9,7 @@ const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const { userAuth } = require("../middlewares/auth");
 
-authRouter.post("/signup", async (req, res) => {   
+authRouter.post("/signup", async (req, res) => {
   try {
     validateSignUpData(req);
 
@@ -51,33 +51,33 @@ authRouter.post("/signup", async (req, res) => {
   }
 });
 
-authRouter.post("/login",async (req,res)=>{
-    try{ 
-         const {emailId,password} = req.body;
-        if(!emailId || !password){ 
-          return res.status(400).send("emailId and password are required");
-        }
-      const user = await User.findOne({emailId});
-      if(!user){
-       return res.status(401).send("Invalid credentials");
-      }
-     const isPasswordValid = await user.validatePassword(password)
-     if (!isPasswordValid) {
+authRouter.post("/login", async (req, res) => {
+  try {
+    const { emailId, password } = req.body;
+    if (!emailId || !password) {
+      return res.status(400).send("emailId and password are required");
+    }
+    const user = await User.findOne({ emailId });
+    if (!user) {
       return res.status(401).send("Invalid credentials");
     }
-        const token = await user.getJWT();
-        const userData = user.toObject();
-            delete userData.password;
-            res.cookie("token", token, {
-              httpOnly: true,
-              secure: true,  // ✅ Required for HTTPS (Render & Vercel)
-              sameSite: "none",  
-            });
-        res.json(userData);
+    const isPasswordValid = await user.validatePassword(password)
+    if (!isPasswordValid) {
+      return res.status(401).send("Invalid credentials");
     }
-    catch (err) {
-      res.status(500).send("Server error");
-    }
+    const token = await user.getJWT();
+    const userData = user.toObject();
+    delete userData.password;
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,  // ✅ Required for HTTPS (Render & Vercel)
+      sameSite: "none",
+    });
+    res.json(userData);
+  }
+  catch (err) {
+    res.status(500).send("Server error");
+  }
 })
 authRouter.post("/logout", async (req, res) => {
   try {
@@ -95,21 +95,21 @@ authRouter.post("/logout", async (req, res) => {
   }
 });
 
-authRouter.post("/forget-password",async(req,res)=>{
-     try{
-       const {emailId} = req.body;
-        if(!emailId || !validator.isEmail(emailId)) {
-        return res.status(400).json({ message: "Valid emailId is required" })
-      };
-      const user = await User.findOne({emailId});
-      if(!user){
-        return res.status(400).json({message:"user not found"});
-      }
-      const otp = crypto.randomInt(100000,999999);
-      const otpExpireTime = 10*60*1000;
-      user.resetPasswordOTP = otp;
-      user.resetPasswordOTPExpires = Date.now() +  otpExpireTime;
-      await user.save();
+authRouter.post("/forget-password", async (req, res) => {
+  try {
+    const { emailId } = req.body;
+    if (!emailId || !validator.isEmail(emailId)) {
+      return res.status(400).json({ message: "Valid emailId is required" })
+    };
+    const user = await User.findOne({ emailId });
+    if (!user) {
+      return res.status(400).json({ message: "user not found" });
+    }
+    const otp = crypto.randomInt(100000, 999999);
+    const otpExpireTime = 10 * 60 * 1000;
+    user.resetPasswordOTP = otp;
+    user.resetPasswordOTPExpires = Date.now() + otpExpireTime;
+    await user.save();
     const htmlContent = `
   <!DOCTYPE html>
   <html lang="en">
@@ -149,66 +149,67 @@ authRouter.post("/forget-password",async(req,res)=>{
   </html>
 `
 
-      const transporter = nodemailer.createTransport({
-        service: 'Gmail', 
-        auth: {
-          user: 'aamireverlasting786@gmail.com',  
-          pass: process.env.GMAIL_PASS_KEY,
-        },
-      });
-      await transporter.sendMail({
-          to:emailId,
-          subject:"Password reset OTP",
-          html:htmlContent
-      });
-     return res.json({
-        message:"Otp sent to your email",
-      })
-      }
-      catch(err){
-        res.status(400).json({message:err.message,gmailPassKey:process.env.GMAIL_PASS_KEY});
-      }
+    const transporter = nodemailer.createTransport({
+      service: 'Gmail',
+      auth: {
+        user: 'aamireverlasting786@gmail.com',
+        pass: process.env.GMAIL_PASS_KEY,
+      },
+    });
+    await transporter.sendMail({
+      to: emailId,
+      subject: "Password reset OTP",
+      html: htmlContent
+    });
+    return res.json({
+      message: "Otp sent to your email",
+    })
+  }
+  catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 
 
 })
-authRouter.post("/reset-password",async(req,res)=>{
-       try{ 
-        const {emailId,otp,newPassword} = req.body;
-       
-         const user = await User.findOne({emailId});
-         if(!user){
-          return res.status(400).json({
-            message:'user not found'});
-         }
-          if(user.resetPasswordOTP !== parseInt(otp)){
-                return res.status(400).json({
-                  message:"invalid OTP"
-                 })            
-          }
-          if(Date.now()>user.resetPasswordOTPExpires){
-           return res.status(400).json({
-              message:"OTP expired"
-            })
-       }
-       if(!validator.isStrongPassword(newPassword)){
+authRouter.post("/reset-password", async (req, res) => {
+  try {
+    const { emailId, otp, newPassword } = req.body;
+
+    const user = await User.findOne({ emailId });
+    if (!user) {
       return res.status(400).json({
-               message:"enter a strong password!"
-        })
-       }
-       const newPasswordHash = await bcrypt.hash(newPassword,10);
-       user.password = newPasswordHash;
-       user.resetPasswordOTP = null;
-       user.resetPasswordOTPExpires = null;
-       await user.save();
-     return  res.json({
-        message:"password reset successfully"
-       })
-}
-catch(err){
-  res.status(400).json({ 
-    message:"something went wrong " + err.message,
+        message: 'user not found'
+      });
+    }
+    if (user.resetPasswordOTP !== parseInt(otp)) {
+      return res.status(400).json({
+        message: "invalid OTP"
+      })
+    }
+    if (Date.now() > user.resetPasswordOTPExpires) {
+      return res.status(400).json({
+        message: "OTP expired"
+      })
+    }
+    if (!validator.isStrongPassword(newPassword)) {
+      return res.status(400).json({
+        message: "enter a strong password!"
+      })
+    }
+    const newPasswordHash = await bcrypt.hash(newPassword, 10);
+    user.password = newPasswordHash;
+    user.resetPasswordOTP = null;
+    user.resetPasswordOTPExpires = null;
+    await user.save();
+    return res.json({
+      message: "password reset successfully"
+    })
   }
-  )
-}
+  catch (err) {
+    res.status(400).json({
+      message: "something went wrong " + err.message,
+    }
+    )
+  }
 })
 module.exports = authRouter;
