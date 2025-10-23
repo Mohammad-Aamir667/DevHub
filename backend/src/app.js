@@ -9,6 +9,7 @@ const socketIo = require('socket.io');
 const server = http.createServer(app);
 const socketManager = require('./sockets/index');
 const { noCache } = require("./middlewares/noCache");
+const socketAuth = require("./middlewares/socketAuth");
 
 const allowedOrigins = [
   "https://dev-hub-one.vercel.app",
@@ -50,8 +51,6 @@ const fileRouter = require("./routes/files");
 const expertRouter = require("./routes/expert");
 const adminRouter = require("./routes/admin");
 const interactionRouter = require("./routes/interaction");
-const socketAuth = require("./middlewares/socketAuth");
-const { noCache } = require("./middlewares/noCache");
 const PORT = process.env.PORT || 10000
 app.use("/", authRouter);
 app.use("/", profileRouter);
