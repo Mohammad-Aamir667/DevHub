@@ -7,7 +7,8 @@ const cors = require("cors");
 const http = require('http');
 const socketIo = require('socket.io');
 const server = http.createServer(app);
-const socketManager =   require('./sockets/index');
+const socketManager = require('./sockets/index');
+const { noCache } = require("./middlewares/noCache");
 
 const allowedOrigins = [
   "https://dev-hub-one.vercel.app",
@@ -29,17 +30,17 @@ const io = socketIo(server, {
     credentials: true,
   },
 });
-
+io.use(socketAuth);
 socketManager(io);
 app.use(express.json());
 app.use(cors({
-  origin: allowedOrigins, 
-  credentials:true,
+  origin: allowedOrigins,
+  credentials: true,
   methods: "GET,POST,PUT,DELETE",
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
 app.use(cookieParser());
-
+app.use(noCache);
 const authRouter = require("./routes/auth");
 const profileRouter = require("./routes/profile");
 const requestRouter = require("./routes/request");
@@ -49,22 +50,24 @@ const fileRouter = require("./routes/files");
 const expertRouter = require("./routes/expert");
 const adminRouter = require("./routes/admin");
 const interactionRouter = require("./routes/interaction");
+const socketAuth = require("./middlewares/socketAuth");
+const { noCache } = require("./middlewares/noCache");
 const PORT = process.env.PORT || 10000
-app.use("/",authRouter);
-app.use("/",profileRouter);
-app.use("/",requestRouter);
-app.use("/",userRouter);
-app.use("/",messageRouter);
-app.use("/",fileRouter);
-app.use("/",expertRouter);
-app.use("/",adminRouter);
-app.use("/",interactionRouter);
-connectDB().then(()=>{
-    console.log("connected successfully")
-    server.listen(PORT,"0.0.0.0",()=>{
-        console.log("server is successfully connected",PORT);
-    })
-  }).catch((err)=>{
-    console.log(err);
-    console.log("could not connect")
-  });
+app.use("/", authRouter);
+app.use("/", profileRouter);
+app.use("/", requestRouter);
+app.use("/", userRouter);
+app.use("/", messageRouter);
+app.use("/", fileRouter);
+app.use("/", expertRouter);
+app.use("/", adminRouter);
+app.use("/", interactionRouter);
+connectDB().then(() => {
+
+  server.listen(PORT, "0.0.0.0", () => {
+    console.log("server is successfully connected", PORT);
+  })
+}).catch((err) => {
+  console.log(err);
+
+});
