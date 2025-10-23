@@ -25,6 +25,7 @@ const Body = () => {
   const shouldBotHideNavBar = hideBotNavBarPaths.some((path) =>
     location.pathname.startsWith(path.replace(":id", ""))
   );
+  const authNotRequiredPaths = ["/forgot-password", "/reset-password", "/login", "/signup"];
   const fetchUser = async () => {
 
     try {
@@ -64,6 +65,10 @@ const Body = () => {
   }, [user]);
 
   useEffect(() => {
+    if (authNotRequiredPaths.includes(location.pathname)) {
+      setLoading(false);
+      return;
+    }
     if (location.pathname === "/" && !user) {
       setLoading(true);
       fetchUser();
