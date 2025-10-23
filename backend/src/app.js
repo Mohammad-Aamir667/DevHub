@@ -9,7 +9,7 @@ const socketIo = require('socket.io');
 const server = http.createServer(app);
 const socketManager = require('./sockets/index');
 const { noCache } = require("./middlewares/noCache");
-const socketAuth = require("./middlewares/socketAuth");
+//const socketAuth = require("./middlewares/socketAuth");
 
 const allowedOrigins = [
   "https://dev-hub-one.vercel.app",
