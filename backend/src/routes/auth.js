@@ -97,105 +97,74 @@ authRouter.post("/logout", async (req, res) => {
 
 authRouter.post("/forget-password", async (req, res) => {
   try {
-    console.log("ENV LOADED:", {
-      GMAIL_USER: process.env.GMAIL_USER_KEY,
-      PASS_EXISTS: !!process.env.GMAIL_PASS_KEY,
-      MONGO: process.env.MONGO_URI ? "YES" : "NO",
-    });
+    console.log("Received /forget-password request:", req.body);
 
-    console.log("Received /forget-password request with body:", req.body);
     const { emailId } = req.body;
     if (!emailId || !validator.isEmail(emailId)) {
-      return res.status(400).json({ message: "Valid emailId is required" })
-    };
+      return res.status(400).json({ message: "Valid emailId is required" });
+    }
+
     const user = await User.findOne({ emailId });
     if (!user) {
-      return res.status(400).json({ message: "user not found" });
+      return res.status(400).json({ message: "User not found" });
     }
+
     const otp = crypto.randomInt(100000, 999999);
-    console.log("Generated OTP:", otp);
     const otpExpireTime = 10 * 60 * 1000;
+
     user.resetPasswordOTP = otp;
     user.resetPasswordOTPExpires = Date.now() + otpExpireTime;
     await user.save();
+
     const htmlContent = `
-  <!DOCTYPE html>
-  <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Password Reset OTP</title>
-  </head>
-  <body style="font-family: Arial, sans-serif; background-color: #f4f4f7; margin: 0; padding: 0;">
-    <table role="presentation" style="max-width: 600px; margin: 30px auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
-      <tr>
-        <td style="background: #4f46e5; padding: 20px; text-align: center;">
-          <h1 style="color: #ffffff; margin: 0;">Password Reset</h1>
-        </td>
-      </tr>
-      <tr>
-        <td style="padding: 20px; color: #333333;">
-          <p>Hello,</p>
-          <p>You requested to reset your password. Use the OTP below to proceed:</p>
-          <div style="text-align: center; margin: 30px 0;">
-            <span style="font-size: 28px; font-weight: bold; color: #4f46e5; letter-spacing: 3px; border: 2px dashed #4f46e5; padding: 12px 24px; border-radius: 6px; display: inline-block;">
-              ${otp}
-            </span>
-          </div>
-          <p>This OTP is valid for <strong>10 minutes</strong>. Please do not share it with anyone.</p>
-          <p>If you did not request this, you can safely ignore this email.</p>
-          <p style="margin-top: 40px;">Thanks,<br/>The Support Team</p>
-        </td>
-      </tr>
-      <tr>
-        <td style="background: #f9fafb; padding: 15px; text-align: center; font-size: 12px; color: #999999;">
-          © ${new Date().getFullYear()} DevHub. All rights reserved.
-        </td>
-      </tr>
-    </table>
-  </body>
-  </html>
-`
+      <h2>Password Reset Request</h2>
+      <p>Your OTP is:</p>
+      <h1 style="letter-spacing:3px; color:#4f46e5;">${otp}</h1>
+      <p>This OTP is valid for <strong>10 minutes</strong>.</p>
+    `;
 
-
-
+    // ✅ CORRECT WORKING SMTP CONFIG FOR RENDER
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
-      port: 465,
-      secure: true,
+      port: 587,          // ✅ Use 587 (NOT 465)
+      secure: false,      // ✅ STARTTLS
       auth: {
         user: process.env.GMAIL_USER_KEY,
         pass: process.env.GMAIL_PASS_KEY,
       },
+      tls: {
+        rejectUnauthorized: false, // ✅ Avoid TLS block on Render
+      },
     });
 
-    console.log("MAIL USER:", process.env.GMAIL_USER_KEY);
-    console.log("MAIL PASS EXISTS:", !!process.env.GMAIL_PASS_KEY);
+    // ✅ Check SMTP status (returns result in response for debugging)
+    const verifyResult = await transporter.verify().catch(err => err);
 
-    // await transporter.sendMail({
-    //   to: emailId,
-    //   subject: "Password reset OTP",
-    //   html: htmlContent
-    // });
+    // ✅ TRY SENDING MAIL
+    const mailResult = await transporter.sendMail({
+      to: emailId,
+      subject: "Password reset OTP",
+      html: htmlContent,
+    }).catch(err => err);
+
+    // ✅ Send Debug Response
     return res.json({
-      message: {
+      success: true,
+      otpSent: (mailResult && !mailResult.response?.includes("Error")),
+      debug: {
         GMAIL_USER: process.env.GMAIL_USER_KEY,
         PASS_EXISTS: !!process.env.GMAIL_PASS_KEY,
-        transporter: transporter,
-        otp,
+        smtpVerify: verifyResult,
+        mailSendResult: mailResult?.response || mailResult?.message || mailResult,
+      },
+    });
 
-
-
-      }
-    })
-  }
-  catch (err) {
+  } catch (err) {
     console.log("Error in /forget-password:", err);
-    res.status(400).json({ message: err.message });
+    return res.status(500).json({ message: err.message });
   }
+});
 
-
-})
 authRouter.post("/reset-password", async (req, res) => {
   try {
     const { emailId, otp, newPassword } = req.body;
