@@ -96,25 +96,68 @@ authRouter.post("/logout", async (req, res) => {
 });
 
 authRouter.post("/forget-password", async (req, res) => {
-
-
   try {
+    console.log("📩 /forget-password request:", req.body);
+
     const { emailId } = req.body;
-    const info = await transporter.sendMail({
-      to: emailId,
-      subject: "Password reset OTP",
-      html: htmlContent
+
+    if (!emailId || !validator.isEmail(emailId)) {
+      return res.status(400).json({ message: "Valid emailId is required" });
+    }
+
+    const user = await User.findOne({ emailId });
+
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    const otp = crypto.randomInt(100000, 999999);
+
+    user.resetPasswordOTP = otp;
+    user.resetPasswordOTPExpires = Date.now() + 10 * 60 * 1000;
+    await user.save();
+
+    const htmlContent = `
+      <h2 style="color:#4f46e5;">Password Reset</h2>
+      <p>Your OTP is:</p>
+      <h1 style="letter-spacing:4px; font-size:32px;">${otp}</h1>
+      <p>Valid for <strong>10 minutes</strong>. Do not share with anyone.</p>
+    `;
+
+
+    const transporter = nodemailer.createTransport({
+      host: "smtp-relay.brevo.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.BREVO_SMTP_USER,
+        pass: process.env.BREVO_SMTP_KEY,
+      },
     });
 
-    return res.json({ message: "Email Sent", info });
+    console.log("✅ SMTP Config Loaded:", {
+      BREVO_SMTP_USER: process.env.BREVO_SMTP_USER,
+      BREVO_SMTP_KEY_EXISTS: !!process.env.BREVO_SMTP_KEY,
+    });
 
-  } catch (mailError) {
-    console.log("MAIL ERROR:", mailError);
-    return res.status(500).json({ error: mailError.message, full: mailError });
+    const mailOptions = {
+      from: `"DevHub Team" <noreply.devhub.team@gmail.com>`,
+      to: emailId,
+      subject: "Your DevHub Password Reset OTP",
+      html: htmlContent,
+    };
+
+    console.log("📨 Sending email...");
+    await transporter.sendMail(mailOptions);
+    console.log("✅ Email sent successfully");
+
+    return res.status(200).json({ success: true, message: "OTP sent successfully" });
   }
-
+  catch (err) {
+    console.log("❌ Error in /forget-password:", err);
+    return res.status(500).json({ success: false, message: "Failed to send OTP", error: err.message });
+  }
 });
-
 authRouter.post("/reset-password", async (req, res) => {
   try {
     const { emailId, otp, newPassword } = req.body;
