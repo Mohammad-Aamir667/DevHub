@@ -322,7 +322,10 @@ authRouter.post("/reset-password", async (req, res) => {
   }
 })
 authRouter.get("/check-email", async (req, res) => {
-  const { emailId } = req.body;
+  const { emailId } = req.query;
+  if (!emailId || !validator.isEmail(emailId)) {
+    return res.status(400).json({ message: "Valid emailId is required" });
+  }
   const existingUser = await User.findOne({ emailId });
 
   if (!existingUser) return res.json({ status: "available" });
