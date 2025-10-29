@@ -151,9 +151,9 @@ authRouter.post("/login", async (req, res) => {
     if (!isPasswordValid) {
       return res.status(401).send("Invalid credentials");
     }
-    if (!user.isVerified) {
-      return res.status(401).send("Email not verified");
-    }
+    // if (!user.isVerified) {
+    //   return res.status(401).send("Email not verified");
+    // }
     const token = await user.getJWT();
     const userData = user.toObject();
     delete userData.password;
@@ -197,7 +197,9 @@ authRouter.post("/forget-password", async (req, res) => {
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }
-
+    if (!user.isVerified) {
+      return res.status(400).json({ message: "Email not verified" });
+    }
     const otp = crypto.randomInt(100000, 999999);
 
     user.resetPasswordOTP = otp;
@@ -319,4 +321,16 @@ authRouter.post("/reset-password", async (req, res) => {
     )
   }
 })
+authRouter.get("/check-email", async (req, res) => {
+  const { emailId } = req.body;
+  const existingUser = await User.findOne({ emailId });
+
+  if (!existingUser) return res.json({ status: "available" });
+
+  if (existingUser.isVerified)
+    return res.json({ status: "verified", message: "Email already registered" });
+
+  return res.json({ status: "not-verified", message: "Email exists but not verified" });
+});
+
 module.exports = authRouter;
