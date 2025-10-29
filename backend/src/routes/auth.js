@@ -130,15 +130,12 @@ authRouter.post("/forget-password", async (req, res) => {
       port: 587,
       secure: false,
       auth: {
-        user: process.env.BREVO_SMTP_USER,
-        pass: process.env.BREVO_SMTP_KEY,
+        user: process.env.BREVO_USER,
+        pass: process.env.BREVO_PASS,
       },
     });
 
-    console.log("✅ SMTP Config Loaded:", {
-      BREVO_SMTP_USER: process.env.BREVO_SMTP_USER,
-      BREVO_SMTP_KEY_EXISTS: !!process.env.BREVO_SMTP_KEY,
-    });
+
 
     const mailOptions = {
       from: `"DevHub Team" <noreply.devhub.team@gmail.com>`,
