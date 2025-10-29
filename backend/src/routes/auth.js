@@ -97,6 +97,7 @@ authRouter.post("/logout", async (req, res) => {
 
 authRouter.post("/forget-password", async (req, res) => {
   try {
+    console.log("Received /forget-password request with body:", req.body);
     const { emailId } = req.body;
     if (!emailId || !validator.isEmail(emailId)) {
       return res.status(400).json({ message: "Valid emailId is required" })
@@ -174,6 +175,7 @@ authRouter.post("/forget-password", async (req, res) => {
     })
   }
   catch (err) {
+    console.log("Error in /forget-password:", err);
     res.status(400).json({ message: err.message });
   }
 
