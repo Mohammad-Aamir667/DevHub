@@ -14,191 +14,91 @@ authRouter.post("/signup", async (req, res) => {
   try {
     validateSignUpData(req);
 
-    const { firstName, lastName, emailId, password } = req.body;
-    const existingUser = await User.findOne({ emailId });
-    if (existingUser && existingUser.isVerified) {
-      return res.status(400).json({ message: "Email already registered" });
-    }
-    if (existingUser && !existingUser.isVerified) {
+    let { firstName, lastName, emailId, password } = req.body;
+    emailId = emailId.toLowerCase(); // prevent duplicates by case
 
+    const existingUser = await User.findOne({ emailId });
+
+    const generateOtpAndTemplate = () => {
       const otp = crypto.randomInt(100000, 999999);
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <body style="font-family: Arial; background:#f4f4f7; padding:40px;">
+          <div style="max-width:480px; background:#fff; padding:30px; border-radius:8px; margin:auto;">
+            <h1 style="text-align:center; font-size:24px; color:#4f46e5;">Verify Your DevHub Account</h1>
+            <p style="font-size:15px; color:#333;">Enter the OTP below to verify your email:</p>
+            <div style="text-align:center; margin:25px 0;">
+              <span style="font-size:32px; font-weight:600; padding:10px 20px; border:2px dashed #4f46e5; color:#4f46e5;">
+                ${otp}
+              </span>
+            </div>
+            <p style="font-size:14px; color:#555;">Valid for 10 minutes. Do not share with anyone.</p>
+            <p style="text-align:center; color:#999; font-size:12px;">© ${new Date().getFullYear()} DevHub.</p>
+          </div>
+        </body>
+        </html>
+      `;
+      return { otp, htmlContent };
+    };
+
+    const resend = new Resend(process.env.RESEND_API_KEY);
+
+    if (existingUser && existingUser.isVerified) {
+      return res.status(400).json({ status: "verified", message: "Email already registered" });
+    }
+
+    if (existingUser && !existingUser.isVerified) {
+      const { otp, htmlContent } = generateOtpAndTemplate();
       existingUser.signupOTP = otp;
       existingUser.signupOTPExpires = Date.now() + 10 * 60 * 1000;
       await existingUser.save();
-      const htmlContent = `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Verify your DevHub Email</title>
-</head>
-<body style="margin:0; padding:0; background:#f4f4f7; font-family:Arial, sans-serif;">
-  <table role="presentation" style="width:100%; border-collapse:collapse;">
-    <tr>
-      <td align="center" style="padding:40px 0;">
-        <table role="presentation" style="width:480px; background:#ffffff; border-radius:8px; padding:30px; box-shadow:0 2px 6px rgba(0,0,0,0.1); text-align:left;">
-          
-          <!-- Logo / Header -->
-          <tr>
-            <td style="text-align:center; padding-bottom:20px;">
-              <h1 style="margin:0; font-size:24px; color:#4f46e5; font-weight:600;">
-                Verify Your DevHub Account
-              </h1>
-            </td>
-          </tr>
 
-          <!-- Body Text -->
-          <tr>
-            <td style="font-size:15px; color:#333; line-height:1.6;">
-              <p>Hello,</p>
-              <p>Thanks for signing up to <strong>DevHub</strong>. Please enter the OTP below to verify your email address and activate your account:</p>
-            </td>
-          </tr>
-
-          <!-- OTP Display -->
-          <tr>
-            <td align="center" style="padding:25px 0;">
-              <div style="font-size:32px; font-weight:bold; color:#4f46e5; border:2px dashed #4f46e5; padding:14px 26px; border-radius:6px;">
-                ${otp}
-              </div>
-            </td>
-          </tr>
-
-          <!-- Footer Info -->
-          <tr>
-            <td style="font-size:14px; color:#555; line-height:1.6;">
-              <p>This OTP is valid for <strong>10 minutes</strong>. Do not share it with anyone.</p>
-              <p>If you did not create this account, you can safely ignore this email.</p>
-              <br />
-              <p style="text-align:center; color:#999; font-size:12px;">
-                © ${new Date().getFullYear()} DevHub. All Rights Reserved.
-              </p>
-            </td>
-          </tr>
-
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>
-`;
-
-      const resend = new Resend(process.env.RESEND_API_KEY);
       await resend.emails.send({
-        from: "DevHub Team <onboarding@resend.dev>", // Works instantly ✅
+        from: "DevHub Team <onboarding@resend.dev>",
         to: emailId,
-        subject: "Your DevHub email verify OTP",
+        subject: "Verify Your DevHub Email",
         html: htmlContent,
       });
 
       return res.status(200).json({
         status: "not-verified",
-        message: "Account exists but not verified. OTP resent."
+        message: "Email already registered but not verified. OTP resent."
       });
-
-
     }
 
-
     const passwordHash = await bcrypt.hash(password, 10);
-    const user = new User({
+    const newUser = new User({
       firstName,
       lastName,
       emailId,
       password: passwordHash,
+      isVerified: false,
     });
 
-    const otp = crypto.randomInt(100000, 999999);
-    user.signupOTP = otp;
-    user.signupOTPExpires = Date.now() + 10 * 60 * 1000;
-    await user.save();
-    const resend = new Resend(process.env.RESEND_API_KEY);
-
-    const htmlContent = `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Verify your DevHub Email</title>
-</head>
-<body style="margin:0; padding:0; background:#f4f4f7; font-family:Arial, sans-serif;">
-  <table role="presentation" style="width:100%; border-collapse:collapse;">
-    <tr>
-      <td align="center" style="padding:40px 0;">
-        <table role="presentation" style="width:480px; background:#ffffff; border-radius:8px; padding:30px; box-shadow:0 2px 6px rgba(0,0,0,0.1); text-align:left;">
-          
-          <!-- Logo / Header -->
-          <tr>
-            <td style="text-align:center; padding-bottom:20px;">
-              <h1 style="margin:0; font-size:24px; color:#4f46e5; font-weight:600;">
-                Verify Your DevHub Account
-              </h1>
-            </td>
-          </tr>
-
-          <!-- Body Text -->
-          <tr>
-            <td style="font-size:15px; color:#333; line-height:1.6;">
-              <p>Hello,</p>
-              <p>Thanks for signing up to <strong>DevHub</strong>. Please enter the OTP below to verify your email address and activate your account:</p>
-            </td>
-          </tr>
-
-          <!-- OTP Display -->
-          <tr>
-            <td align="center" style="padding:25px 0;">
-              <div style="font-size:32px; font-weight:bold; color:#4f46e5; border:2px dashed #4f46e5; padding:14px 26px; border-radius:6px;">
-                ${otp}
-              </div>
-            </td>
-          </tr>
-
-          <!-- Footer Info -->
-          <tr>
-            <td style="font-size:14px; color:#555; line-height:1.6;">
-              <p>This OTP is valid for <strong>10 minutes</strong>. Do not share it with anyone.</p>
-              <p>If you did not create this account, you can safely ignore this email.</p>
-              <br />
-              <p style="text-align:center; color:#999; font-size:12px;">
-                © ${new Date().getFullYear()} DevHub. All Rights Reserved.
-              </p>
-            </td>
-          </tr>
-
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>
-`;
-
-
-
+    const { otp, htmlContent } = generateOtpAndTemplate();
+    newUser.signupOTP = otp;
+    newUser.signupOTPExpires = Date.now() + 10 * 60 * 1000;
+    await newUser.save();
 
     await resend.emails.send({
-      from: "DevHub Team <onboarding@resend.dev>", // Works instantly ✅
+      from: "DevHub Team <onboarding@resend.dev>",
       to: emailId,
-      subject: "Your DevHub email verify OTP",
+      subject: "Verify Your DevHub Email",
       html: htmlContent,
     });
 
-
     return res.status(201).json({
       status: "new-user",
-      message: "User created. Verification code sent."
+      message: "Account created. OTP sent for verification."
     });
 
   } catch (err) {
-    if (err.statusCode === 400) {
-      return res.status(400).json(err.message);
-    }
-
     console.error(err);
-    res.status(500).send("Server error");
+    return res.status(500).json({ message: "Server error" });
   }
 });
+
 authRouter.post("/verify-email", async (req, res) => {
   try {
     const { emailId, otp } = req.body;
