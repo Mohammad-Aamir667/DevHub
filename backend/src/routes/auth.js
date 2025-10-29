@@ -156,8 +156,7 @@ authRouter.post("/forget-password", async (req, res) => {
   </body>
   </html>
 `
-    console.log("MAIL USER:", process.env.GMAIL_USER_KEY);
-    console.log("MAIL PASS EXISTS:", !!process.env.GMAIL_PASS_KEY);
+
 
 
     const transporter = nodemailer.createTransport({
@@ -179,7 +178,15 @@ authRouter.post("/forget-password", async (req, res) => {
     //   html: htmlContent
     // });
     return res.json({
-      message: "Otp sent to your email",
+      message: {
+        GMAIL_USER: process.env.GMAIL_USER_KEY,
+        PASS_EXISTS: !!process.env.GMAIL_PASS_KEY,
+        transporter: transporter,
+        otp,
+
+
+
+      }
     })
   }
   catch (err) {
