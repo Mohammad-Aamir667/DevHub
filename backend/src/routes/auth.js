@@ -152,7 +152,7 @@ authRouter.post("/forget-password", async (req, res) => {
     const transporter = nodemailer.createTransport({
       service: 'Gmail',
       auth: {
-        user: 'aamireverlasting786@gmail.com',
+        user: process.env.GMAIL_USER_KEY,
         pass: process.env.GMAIL_PASS_KEY,
       },
     });
