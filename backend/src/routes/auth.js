@@ -8,6 +8,7 @@ const authRouter = express.Router();
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const { userAuth } = require("../middlewares/auth");
+const { Resend } = require("resend");
 
 authRouter.post("/signup", async (req, res) => {
   try {
@@ -95,6 +96,7 @@ authRouter.post("/logout", async (req, res) => {
   }
 });
 
+
 authRouter.post("/forget-password", async (req, res) => {
   try {
     console.log("📩 /forget-password request:", req.body);
@@ -117,6 +119,8 @@ authRouter.post("/forget-password", async (req, res) => {
     user.resetPasswordOTPExpires = Date.now() + 10 * 60 * 1000;
     await user.save();
 
+    const resend = new Resend(process.env.RESEND_API_KEY);
+
     const htmlContent = `
       <h2 style="color:#4f46e5;">Password Reset</h2>
       <p>Your OTP is:</p>
@@ -124,38 +128,25 @@ authRouter.post("/forget-password", async (req, res) => {
       <p>Valid for <strong>10 minutes</strong>. Do not share with anyone.</p>
     `;
 
+    console.log("📨 Sending email via Resend...");
 
-    const transporter = nodemailer.createTransport({
-      host: process.env.BREVO_HOST,
-      port: process.env.BREVO_PORT,
-      secure: false,
-      auth: {
-        user: process.env.BREVO_USER,
-        pass: process.env.BREVO_PASS,
-      },
-    });
-
-
-
-
-    const mailOptions = {
-      from: `"DevHub Team" <noreply.devhub.team@gmail.com>`,
+    await resend.emails.send({
+      from: "DevHub Team <onboarding@resend.dev>", // Works instantly ✅
       to: emailId,
       subject: "Your DevHub Password Reset OTP",
       html: htmlContent,
-    };
+    });
 
-    console.log("📨 Sending email...");
-    await transporter.sendMail(mailOptions);
     console.log("✅ Email sent successfully");
 
     return res.status(200).json({ success: true, message: "OTP sent successfully" });
-  }
-  catch (err) {
+
+  } catch (err) {
     console.log("❌ Error in /forget-password:", err);
     return res.status(500).json({ success: false, message: "Failed to send OTP", error: err.message });
   }
 });
+
 authRouter.post("/reset-password", async (req, res) => {
   try {
     const { emailId, otp, newPassword } = req.body;
