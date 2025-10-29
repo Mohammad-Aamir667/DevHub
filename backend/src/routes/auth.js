@@ -126,14 +126,15 @@ authRouter.post("/forget-password", async (req, res) => {
 
 
     const transporter = nodemailer.createTransport({
-      host: "smtp-relay.brevo.com",
-      port: 587,
+      host: process.env.BREVO_HOST,
+      port: process.env.BREVO_PORT,
       secure: false,
       auth: {
         user: process.env.BREVO_USER,
         pass: process.env.BREVO_PASS,
       },
     });
+
 
 
 
