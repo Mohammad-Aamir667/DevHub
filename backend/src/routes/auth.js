@@ -97,6 +97,12 @@ authRouter.post("/logout", async (req, res) => {
 
 authRouter.post("/forget-password", async (req, res) => {
   try {
+    console.log("ENV LOADED:", {
+      GMAIL_USER: process.env.GMAIL_USER_KEY,
+      PASS_EXISTS: !!process.env.GMAIL_PASS_KEY,
+      MONGO: process.env.MONGO_URI ? "YES" : "NO",
+    });
+
     console.log("Received /forget-password request with body:", req.body);
     const { emailId } = req.body;
     if (!emailId || !validator.isEmail(emailId)) {
@@ -107,6 +113,7 @@ authRouter.post("/forget-password", async (req, res) => {
       return res.status(400).json({ message: "user not found" });
     }
     const otp = crypto.randomInt(100000, 999999);
+    console.log("Generated OTP:", otp);
     const otpExpireTime = 10 * 60 * 1000;
     user.resetPasswordOTP = otp;
     user.resetPasswordOTPExpires = Date.now() + otpExpireTime;
@@ -162,14 +169,15 @@ authRouter.post("/forget-password", async (req, res) => {
         pass: process.env.GMAIL_PASS_KEY,
       },
     });
+
     console.log("MAIL USER:", process.env.GMAIL_USER_KEY);
     console.log("MAIL PASS EXISTS:", !!process.env.GMAIL_PASS_KEY);
 
-    await transporter.sendMail({
-      to: emailId,
-      subject: "Password reset OTP",
-      html: htmlContent
-    });
+    // await transporter.sendMail({
+    //   to: emailId,
+    //   subject: "Password reset OTP",
+    //   html: htmlContent
+    // });
     return res.json({
       message: "Otp sent to your email",
     })
