@@ -148,14 +148,22 @@ authRouter.post("/forget-password", async (req, res) => {
   </body>
   </html>
 `
+    console.log("MAIL USER:", process.env.GMAIL_USER_KEY);
+    console.log("MAIL PASS EXISTS:", !!process.env.GMAIL_PASS_KEY);
+
 
     const transporter = nodemailer.createTransport({
-      service: 'Gmail',
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
       auth: {
         user: process.env.GMAIL_USER_KEY,
         pass: process.env.GMAIL_PASS_KEY,
       },
     });
+    console.log("MAIL USER:", process.env.GMAIL_USER_KEY);
+    console.log("MAIL PASS EXISTS:", !!process.env.GMAIL_PASS_KEY);
+
     await transporter.sendMail({
       to: emailId,
       subject: "Password reset OTP",
