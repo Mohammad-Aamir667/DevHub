@@ -26,6 +26,7 @@ import CreateGroupChat from "./components/chat/CreateGroupChat"
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ExpertProfilePublicView from "./components/profile/public/ExpertProfilePublicView"
+import VerifyEmail from "./components/userAuth/VerifyEmail"
 
 function App() {
 
@@ -63,6 +64,7 @@ function App() {
                 <Route path="/expert/:expertId" element={<ExpertProfilePublicView />}></Route>
                 <Route path="/notifications" element={<Notifications />}></Route>
                 <Route path="/create-group-chat" element={<CreateGroupChat />}></Route>
+                <Route path="/verify-email" element={<VerifyEmail />}></Route>
               </Route>
             </Routes>
           </BrowserRouter>
