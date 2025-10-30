@@ -63,7 +63,7 @@ authRouter.post("/signup", async (req, res) => {
 
       return res.status(200).json({
         status: "not-verified",
-        message: "Email already registered but not verified. OTP resent."
+        message: "Email already registered but not verified. OTP resent.",
         user: existingUser
       });
     }
