@@ -3,89 +3,90 @@ const validator = require("validator");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const userSchema = new mongoose.Schema({
-    firstName:{
-        type:String,
-        required:true,
+    firstName: {
+        type: String,
+        required: true,
     },
-    lastName:{
-        type:String,
+    lastName: {
+        type: String,
     },
-    emailId:{
-        type:String,
-        required:true,
-        unique:true,
-        lowercase:true,
-        trim:true,
-        validate(value){
-               if(!validator.isEmail(value)){
+    emailId: {
+        type: String,
+        required: true,
+        unique: true,
+        lowercase: true,
+        trim: true,
+        validate(value) {
+            if (!validator.isEmail(value)) {
                 throw new Error("invalid email address " + value);
-               }
+            }
         },
     },
-    role:{ 
+    role: {
         type: String,
         enum: ["user", "admin", "super-admin"],
-        default: "user" 
-        },
-        type: { type: String, enum: ["user", "expert"], default: "user" },
-    about:{ 
-        type:String,
-        maxLength:300,
+        default: "user"
     },
-    age:{
-        type:Number,
+    type: { type: String, enum: ["user", "expert"], default: "user" },
+    about: {
+        type: String,
+        maxLength: 300,
     },
-    skills:{
-    type:[String],
+    age: {
+        type: Number,
     },
-    photoUrl:{
-       type:String,
-       default:"https://as1.ftcdn.net/v2/jpg/00/64/67/52/1000_F_64675209_7ve2XQANuzuHjMZXP3aIYIpsDKEbF5dD.jpg",
-       validate(value){
-        if(!validator.isURL(value)){
-            throw new Error("Invalid URL")
-        }
-       }
+    skills: {
+        type: [String],
     },
-    gender:{
-        type:String,
-        lowercase:true,
-        validate(value){
-            if(!["male","female","others"].includes(value)){
-                 throw new Error("Gender is not valid");
+    photoUrl: {
+        type: String,
+        default: "https://as1.ftcdn.net/v2/jpg/00/64/67/52/1000_F_64675209_7ve2XQANuzuHjMZXP3aIYIpsDKEbF5dD.jpg",
+        validate(value) {
+            if (!validator.isURL(value)) {
+                throw new Error("Invalid URL")
             }
         }
     },
-    password:{
-    type:String,
-    required:true,
-    validate(value){
-        if(!validator.isStrongPassword(value)){
-            throw new Error("Please enter a strong password");
+    gender: {
+        type: String,
+        lowercase: true,
+        validate(value) {
+            if (!["male", "female", "others"].includes(value)) {
+                throw new Error("Gender is not valid");
+            }
         }
-    }
     },
-    resetPasswordOTP:{
-        type:Number,
+    password: {
+        type: String,
+        required: true,
+        validate(value) {
+            if (!validator.isStrongPassword(value)) {
+                throw new Error("Please enter a strong password");
+            }
+        }
     },
-    resetPasswordOTPExpires:{
-          type:Date,
+    resetPasswordOTP: {
+        type: Number,
     },
-     signupOTP:{
-        type:Number,
+    resetPasswordOTPExpires: {
+        type: Date,
     },
-    signupOTPOTPExpires:{
-          type:Date,
+    signupOTP: {
+        type: Number,
     },
-    
-},{timestamps:true});
-userSchema.methods.getJWT = async function(){
-    const user  = this;
-     const token =  await jwt.sign({_id:user._id},process.env.JWT_SECRET,{expiresIn:"7d"})
-     return token;
-    }
-userSchema.methods.validatePassword = async function(password){
+    signupOTPExpires: {
+        type: Date,
+    },
+    isVerified: { type: Boolean, default: false },
+
+}, { timestamps: true });
+userSchema.methods.getJWT = async function () {
     const user = this;
-   return isPasswordValid = await bcrypt.compare(password,user.password);
+    const token = await jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" })
+    return token;
 }
-module.exports = mongoose.model("User",userSchema);
+userSchema.methods.validatePassword = async function (password) {
+    const user = this;
+    return isPasswordValid = await bcrypt.compare(password, user.password);
+}
+module.exports = mongoose.model("User", userSchema);
