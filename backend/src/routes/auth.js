@@ -15,7 +15,7 @@ authRouter.post("/signup", async (req, res) => {
     validateSignUpData(req);
 
     let { firstName, lastName, emailId, password } = req.body;
-    emailId = emailId.toLowerCase(); // prevent duplicates by case
+    emailId = emailId.toLowerCase();
 
     const existingUser = await User.findOne({ emailId });
 
@@ -43,9 +43,13 @@ authRouter.post("/signup", async (req, res) => {
     };
 
     const resend = new Resend(process.env.RESEND_API_KEY);
-
-    if (existingUser && existingUser.isVerified) {
-      return res.status(400).json({ status: "verified", message: "Email already registered", user: existingUser });
+    if (existingUser) {
+      if (existingUser.isVerified === true) {
+        return res.status(200).json({
+          status: "verified",
+          message: "Email already registered and verified.",
+        });
+      }
     }
 
     if (existingUser && !existingUser.isVerified) {
@@ -64,7 +68,7 @@ authRouter.post("/signup", async (req, res) => {
       return res.status(200).json({
         status: "not-verified",
         message: "Email already registered but not verified. OTP resent.",
-        user: existingUser
+
       });
     }
 
@@ -96,7 +100,7 @@ authRouter.post("/signup", async (req, res) => {
 
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: "Server error", error: err.message });
   }
 });
 
@@ -145,16 +149,14 @@ authRouter.post("/login", async (req, res) => {
       return res.status(400).send("emailId and password are required");
     }
     const user = await User.findOne({ emailId });
-    if (!user) {
+    if (!user || !user.isVerified) {
       return res.status(401).send("Invalid credentials");
     }
     const isPasswordValid = await user.validatePassword(password)
     if (!isPasswordValid) {
       return res.status(401).send("Invalid credentials");
     }
-    // if (!user.isVerified) {
-    //   return res.status(401).send("Email not verified");
-    // }
+
     const token = await user.getJWT();
     const userData = user.toObject();
     delete userData.password;
