@@ -45,7 +45,7 @@ authRouter.post("/signup", async (req, res) => {
     const resend = new Resend(process.env.RESEND_API_KEY);
 
     if (existingUser && existingUser.isVerified) {
-      return res.status(400).json({ status: "verified", message: "Email already registered" });
+      return res.status(400).json({ status: "verified", message: "Email already registered", user: existingUser });
     }
 
     if (existingUser && !existingUser.isVerified) {
