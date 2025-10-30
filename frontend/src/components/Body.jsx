@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import NavBar from './NavBar'
+import TopNavBar from './navigation/TopNavBar'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { BASE_URL } from '../utils/constants'
 import { useDispatch, useSelector } from 'react-redux'
 import { addUser } from '../utils/userSlice'
-import BottomNavigation from './BottomNav'
+import BottomNavigation from './navigation/BottomNav'
 import { updateExpertStatus } from '../utils/expertDetailsSlice';
 import { Loader2 } from 'lucide-react'
 
@@ -25,7 +25,7 @@ const Body = () => {
   const shouldBotHideNavBar = hideBotNavBarPaths.some((path) =>
     location.pathname.startsWith(path.replace(":id", ""))
   );
-  const authNotRequiredPaths = ["/forgot-password", "/reset-password", "/login", "/signup"];
+  const authNotRequiredPaths = ["/forgot-password", "/reset-password", "/login", "/signup", "/verify-email"];
   const fetchUser = async () => {
 
     try {
@@ -87,7 +87,7 @@ const Body = () => {
 
   return (
     <div>
-      {!shouldTopHideNavBar && <NavBar />}
+      {!shouldTopHideNavBar && <TopNavBar />}
       <div className={`flex-1 ${!shouldBotHideNavBar ? "pb-14" : ""}`}>
         <Outlet />
       </div>
