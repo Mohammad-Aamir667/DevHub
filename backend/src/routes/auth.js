@@ -12,7 +12,12 @@ const { Resend } = require("resend");
 
 authRouter.post("/signup", async (req, res) => {
   try {
-    validateSignUpData(req);
+    const validation = validateSignUpData(req);
+
+    if (!validation.isValid) {
+      return res.status(400).json({ message: validation.message });
+    }
+
 
     let { firstName, lastName, emailId, password } = req.body;
     emailId = emailId.toLowerCase();
