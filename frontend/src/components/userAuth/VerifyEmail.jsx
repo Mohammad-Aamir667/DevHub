@@ -1,15 +1,23 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { BASE_URL } from "../../utils/constants";
 import { useDispatch } from "react-redux";
 import { addUser } from "../../utils/userSlice";
-
 const VerifyEmail = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [otp, setOtp] = useState("");
+    const location = useLocation()
+    const emailId = location.state?.emailId;
+    useEffect(() => {
+        if (!emailId) {
+            toast.error("No email found. Redirecting to signup.");
+            navigate("/login");
+        }
+    }, [emailId, navigate]);
+
 
     const handleVerify = async (e) => {
         e.preventDefault();
@@ -18,7 +26,7 @@ const VerifyEmail = () => {
         try {
             const res = await axios.post(
                 BASE_URL + "/verify-email",
-                { otp },  // No need to send email here since it's in cookies/session
+                { otp, emailId },  // No need to send email here since it's in cookies/session
                 { withCredentials: true }
             );
 
