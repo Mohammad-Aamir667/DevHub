@@ -106,17 +106,20 @@ const Login = () => {
       }, { withCredentials: true });
       if (res.data.status === "new-user") {
         toast("Verification code sent!");
-        navigate("/verify-email");
+        navigate("/verify-email", { state: { emailId: emailId } });
       }
 
       if (res.data.status === "not-verified") {
         toast("Account not verified. OTP resent.");
-        navigate("/verify-email");
+        navigate("/verify-email", { state: { emailId: emailId } });
       }
-
       if (res.data.status === "verified") {
         toast("Email already registered. Please login.");
+        setIsLoginForm(true);
+
       }
+
+
 
     } catch (err) {
       console.log(err);
