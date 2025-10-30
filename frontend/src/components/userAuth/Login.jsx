@@ -114,7 +114,7 @@ const Login = () => {
         navigate("/verify-email");
       }
 
-      if (res.data.status === "already-verified") {
+      if (res.data.status === "verified") {
         toast("Email already registered. Please login.");
       }
 
