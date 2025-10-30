@@ -5,6 +5,7 @@ import { addUser } from '../../utils/userSlice';
 import { useNavigate } from 'react-router-dom';
 import { BASE_URL } from '../../utils/constants';
 import { handleAxiosError } from '../../utils/handleAxiosError';
+import { toast } from "react-toastify";
 
 
 const Login = () => {
@@ -69,15 +70,14 @@ const Login = () => {
     }
   }, [password, confirmPassword]);
 
+
+
   const handleSignUp = async () => {
     if (!firstName && !lastName && !emailId && !password && !confirmPassword) {
       setError("All fields are required");
       return;
     } else if (!firstName) {
       setError("First name is required");
-      return;
-    } else if (!lastName) {
-      setError("Last name is required");
       return;
     } else if (!emailId) {
       setError("Email is required");
@@ -104,8 +104,20 @@ const Login = () => {
         emailId: emailId.trim(),
         password,
       }, { withCredentials: true });
-      dispatch(addUser(res.data));
-      navigate("/profile");
+      if (res.data.status === "new-user") {
+        toast("Verification code sent!");
+        navigate("/verify-email");
+      }
+
+      if (res.data.status === "not-verified") {
+        toast("Account not verified. OTP resent.");
+        navigate("/verify-email");
+      }
+
+      if (res.data.status === "already-verified") {
+        toast("Email already registered. Please login.");
+      }
+
     } catch (err) {
       console.log(err);
       if (err?.response?.status === 401 || err?.response?.status === 400)
