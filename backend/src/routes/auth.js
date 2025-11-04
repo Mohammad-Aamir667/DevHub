@@ -3,12 +3,10 @@ require("dotenv").config()
 const crypto = require("crypto");
 const validator = require("validator");
 const { validateSignUpData } = require("../utils/validation");
-const nodemailer = require("nodemailer");
 const authRouter = express.Router();
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
-const { userAuth } = require("../middlewares/auth");
-const brevoTransporter = require("../utils/brevoTransporter");
+const sendMail = require("../utils/sendMail");
 authRouter.post("/signup", async (req, res) => {
   try {
     const validation = validateSignUpData(req);
@@ -60,15 +58,7 @@ authRouter.post("/signup", async (req, res) => {
       existingUser.signupOTP = otp;
       existingUser.signupOTPExpires = Date.now() + 10 * 60 * 1000;
       await existingUser.save();
-      const mailOptions = {
-        from: `"${process.env.FROM_NAME}" <${process.env.FROM_EMAIL}>`,
-        to: emailId,
-        subject: "DevHub Email Verification",
-        html: htmlContent,
-      };
-
-      await brevoTransporter.sendMail(mailOptions);
-
+      await sendMail(emailId, "Verify Your DevHub Email", htmlContent);
 
       return res.status(200).json({
         status: "not-verified",
@@ -90,15 +80,7 @@ authRouter.post("/signup", async (req, res) => {
     newUser.signupOTP = otp;
     newUser.signupOTPExpires = Date.now() + 10 * 60 * 1000;
     await newUser.save();
-    const mailOptions = {
-      from: `"${process.env.FROM_NAME}" <${process.env.FROM_EMAIL}>`,
-      to: emailId,
-      subject: "DevHub Email Verification",
-      html: htmlContent,
-    };
-
-    await brevoTransporter.sendMail(mailOptions);
-
+    await sendMail(emailId, "Verify Your DevHub Email", htmlContent);
 
     return res.status(201).json({
       status: "new-user",
@@ -276,15 +258,7 @@ authRouter.post("/forget-password", async (req, res) => {
 `;
 
 
-
-    const mailOptions = {
-      from: `"${process.env.FROM_NAME}" <${process.env.FROM_EMAIL}>`,
-      to: emailId,
-      subject: "DevHub Forget Password Request",
-      html: htmlContent,
-    };
-
-    await brevoTransporter.sendMail(mailOptions);
+    await sendMail(emailId, "Verify Your DevHub Email", htmlContent);
 
 
 
