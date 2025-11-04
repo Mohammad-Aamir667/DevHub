@@ -8,7 +8,7 @@ const authRouter = express.Router();
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const { userAuth } = require("../middlewares/auth");
-const { brevoTransporter } = require("../utils/brevoTransporter");
+const brevoTransporter = require("../utils/brevoTransporter");
 authRouter.post("/signup", async (req, res) => {
   try {
     const validation = validateSignUpData(req);
