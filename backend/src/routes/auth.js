@@ -8,8 +8,7 @@ const authRouter = express.Router();
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const { userAuth } = require("../middlewares/auth");
-const { Resend } = require("resend");
-
+const { brevoTransporter } = require("../utils/brevoTransporter");
 authRouter.post("/signup", async (req, res) => {
   try {
     const validation = validateSignUpData(req);
@@ -47,7 +46,6 @@ authRouter.post("/signup", async (req, res) => {
       return { otp, htmlContent };
     };
 
-    const resend = new Resend(process.env.RESEND_API_KEY);
     if (existingUser) {
       if (existingUser.isVerified === true) {
         return res.status(200).json({
@@ -62,13 +60,15 @@ authRouter.post("/signup", async (req, res) => {
       existingUser.signupOTP = otp;
       existingUser.signupOTPExpires = Date.now() + 10 * 60 * 1000;
       await existingUser.save();
-
-      await resend.emails.send({
-        from: "DevHub Team <onboarding@resend.dev>",
+      const mailOptions = {
+        from: `"${process.env.FROM_NAME}" <${process.env.FROM_EMAIL}>`,
         to: emailId,
-        subject: "Verify Your DevHub Email",
+        subject: "DevHub Email Verification",
         html: htmlContent,
-      });
+      };
+
+      await brevoTransporter.sendMail(mailOptions);
+
 
       return res.status(200).json({
         status: "not-verified",
@@ -90,13 +90,15 @@ authRouter.post("/signup", async (req, res) => {
     newUser.signupOTP = otp;
     newUser.signupOTPExpires = Date.now() + 10 * 60 * 1000;
     await newUser.save();
-
-    await resend.emails.send({
-      from: "DevHub Team <onboarding@resend.dev>",
+    const mailOptions = {
+      from: `"${process.env.FROM_NAME}" <${process.env.FROM_EMAIL}>`,
       to: emailId,
-      subject: "Verify Your DevHub Email",
+      subject: "DevHub Email Verification",
       html: htmlContent,
-    });
+    };
+
+    await brevoTransporter.sendMail(mailOptions);
+
 
     return res.status(201).json({
       status: "new-user",
@@ -104,9 +106,12 @@ authRouter.post("/signup", async (req, res) => {
     });
 
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: "Server error", error: err.message });
+    return res.status(500).json({
+      success: false,
+      message: "An unexpected error occurred while creating account. Please try again later.",
+    });
   }
+
 });
 
 authRouter.post("/verify-email", async (req, res) => {
@@ -214,7 +219,6 @@ authRouter.post("/forget-password", async (req, res) => {
     user.resetPasswordOTPExpires = Date.now() + 10 * 60 * 1000;
     await user.save();
 
-    const resend = new Resend(process.env.RESEND_API_KEY);
 
     const htmlContent = `
 <!DOCTYPE html>
@@ -273,12 +277,15 @@ authRouter.post("/forget-password", async (req, res) => {
 
 
 
-    await resend.emails.send({
-      from: "DevHub Team <onboarding@resend.dev>", // Works instantly ✅
+    const mailOptions = {
+      from: `"${process.env.FROM_NAME}" <${process.env.FROM_EMAIL}>`,
       to: emailId,
-      subject: "Your DevHub Password Reset OTP",
+      subject: "DevHub Forget Password Request",
       html: htmlContent,
-    });
+    };
+
+    await brevoTransporter.sendMail(mailOptions);
+
 
 
     return res.status(200).json({ success: true, message: "OTP sent successfully" });
