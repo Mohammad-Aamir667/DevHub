@@ -9,18 +9,19 @@ const User = require("../models/user");
 const sendMail = require("../utils/sendMail");
 authRouter.post("/signup", async (req, res) => {
   try {
+    // ✅ 1. Validate input
     const validation = validateSignUpData(req);
-
     if (!validation.isValid) {
       return res.status(400).json({ message: validation.message });
     }
 
-
     let { firstName, lastName, emailId, password } = req.body;
     emailId = emailId.toLowerCase();
 
+    // ✅ 2. Check if user already exists
     const existingUser = await User.findOne({ emailId });
 
+    // ✅ 3. Generate OTP + HTML Template
     const generateOtpAndTemplate = () => {
       const otp = crypto.randomInt(100000, 999999);
       const htmlContent = `
@@ -44,29 +45,38 @@ authRouter.post("/signup", async (req, res) => {
       return { otp, htmlContent };
     };
 
-    if (existingUser) {
-      if (existingUser.isVerified === true) {
-        return res.status(200).json({
-          status: "verified",
-          message: "Email already registered and verified.",
-        });
-      }
+    // ✅ 4. Handle verified existing user
+    if (existingUser && existingUser.isVerified) {
+      return res.status(409).json({
+        status: "verified",
+        message: "This email is already registered. Please log in instead.",
+      });
     }
 
+    // ✅ 5. Handle existing but unverified user (resend OTP)
     if (existingUser && !existingUser.isVerified) {
       const { otp, htmlContent } = generateOtpAndTemplate();
       existingUser.signupOTP = otp;
       existingUser.signupOTPExpires = Date.now() + 10 * 60 * 1000;
       await existingUser.save();
-      await sendMail(emailId, "Verify Your DevHub Email", htmlContent);
+
+      const mailResponse = await sendMail(emailId, "Verify Your DevHub Email", htmlContent);
+
+      if (!mailResponse.success) {
+        // ⚠️ Don’t break UX — still respond gracefully
+        return res.status(200).json({
+          status: "mail-failed",
+          message: "Verification mail may be delayed. Please try resending the OTP later.",
+        });
+      }
 
       return res.status(200).json({
         status: "not-verified",
-        message: "Email already registered but not verified. OTP resent.",
-
+        message: "Account exists but not verified. OTP resent successfully.",
       });
     }
 
+    // ✅ 6. Handle new user registration
     const passwordHash = await bcrypt.hash(password, 10);
     const newUser = new User({
       firstName,
@@ -80,39 +90,43 @@ authRouter.post("/signup", async (req, res) => {
     newUser.signupOTP = otp;
     newUser.signupOTPExpires = Date.now() + 10 * 60 * 1000;
     await newUser.save();
-    await sendMail(emailId, "Verify Your DevHub Email", htmlContent);
 
+    const mailResponse = await sendMail(emailId, "Verify Your DevHub Email", htmlContent);
+
+    if (!mailResponse.success) {
+      // ⚠️ Keep the account created — let the user resend OTP later
+      return res.status(201).json({
+        status: "mail-failed",
+        message: "Account created, but verification mail may be delayed. Please try again later.",
+      });
+    }
+
+    // ✅ 7. Success — mail sent
     return res.status(201).json({
       status: "new-user",
-      message: "Account created. OTP sent for verification."
+      message: "Account created. Verification OTP sent successfully.",
     });
 
   } catch (err) {
+    console.error("Signup error:", err);
     return res.status(500).json({
       success: false,
-      message: "An unexpected error occurred while creating account. Please try again later.",
+      message: "Something went wrong while creating your account. Please try again later.",
     });
   }
-
 });
-
 authRouter.post("/verify-email", async (req, res) => {
   try {
     const { emailId, otp } = req.body;
     const user = await User.findOne({ emailId });
-    if (!user) {
+    if (!user || user.signupOTP !== parseInt(otp)) {
       return res.status(400).json({
-        message: 'user not found'
+        message: "Verification failed. Please check your email and OTP.",
       });
-    }
-    if (user.signupOTP !== parseInt(otp)) {
-      return res.status(400).json({
-        message: "invalid OTP"
-      })
     }
     if (Date.now() > user.signupOTPExpires) {
       return res.status(400).json({
-        message: "OTP expired"
+        message: "OTP expired. Please request a new one.",
       })
     }
     user.signupOTP = null;
@@ -131,7 +145,9 @@ authRouter.post("/verify-email", async (req, res) => {
     res.json(userData);
   }
   catch (err) {
-    res.status(400).json({ message: "something went wrong " + err.message, })
+    res.status(500).json({
+      message: "Something went wrong. Please try again later.",
+    });
   }
 });
 authRouter.post("/login", async (req, res) => {
@@ -180,136 +196,128 @@ authRouter.post("/logout", async (req, res) => {
 });
 authRouter.post("/forget-password", async (req, res) => {
   try {
-
     const { emailId } = req.body;
 
     if (!emailId || !validator.isEmail(emailId)) {
-      return res.status(400).json({ message: "Valid emailId is required" });
+      return res.status(400).json({ message: "Please enter a valid email address." });
     }
 
     const user = await User.findOne({ emailId });
 
-    if (!user) {
-      return res.status(400).json({ message: "User not found" });
-    }
-    if (!user.isVerified) {
-      return res.status(400).json({ message: "Email not verified" });
-    }
-    const otp = crypto.randomInt(100000, 999999);
+    // ⚠️ Generic response (prevents email existence exposure)
+    const genericResponse = {
+      success: true,
+      message: "If this email is registered, an OTP has been sent to your inbox.",
+    };
 
+    // If user doesn’t exist or is unverified → always return generic response
+    if (!user || !user.isVerified) {
+      console.log(`⚠️ Password reset requested for invalid/unverified email: ${emailId}`);
+      return res.status(200).json(genericResponse);
+    }
+
+    // Generate OTP and update user
+    const otp = crypto.randomInt(100000, 999999);
     user.resetPasswordOTP = otp;
     user.resetPasswordOTPExpires = Date.now() + 10 * 60 * 1000;
     await user.save();
 
-
+    // Build email template
     const htmlContent = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8" />
-  <title>Password Reset OTP</title>
-</head>
-<body style="margin:0; padding:0; background:#f4f4f7; font-family:Arial, sans-serif;">
-  <table role="presentation" style="width:100%; border-collapse:collapse;">
-    <tr>
-      <td align="center" style="padding:40px 0;">
-        <table role="presentation" style="width:480px; background:#ffffff; border-radius:8px; padding:30px; box-shadow:0 2px 6px rgba(0,0,0,0.1); text-align:left;">
-          
-          <!-- Header -->
-          <tr>
-            <td style="text-align:center; padding-bottom:20px;">
-              <h1 style="margin:0; font-size:24px; color:#4f46e5;">DevHub Password Reset</h1>
-            </td>
-          </tr>
-          
-          <!-- Body -->
-          <tr>
-            <td style="font-size:15px; color:#333; line-height:1.6;">
-              <p>Hello,</p>
-              <p>We received a request to reset your password. Please use the OTP below to continue:</p>
-            </td>
-          </tr>
+      <!DOCTYPE html>
+      <html>
+      <body style="font-family: Arial; background:#f4f4f7; padding:40px;">
+        <div style="max-width:480px; background:#fff; padding:30px; border-radius:8px; margin:auto;">
+          <h1 style="text-align:center; font-size:24px; color:#4f46e5;">DevHub Password Reset</h1>
+          <p style="font-size:15px; color:#333;">We received a password reset request for your DevHub account.</p>
+          <p style="text-align:center; margin:25px 0;">
+            <span style="font-size:32px; font-weight:bold; border:2px dashed #4f46e5; color:#4f46e5; padding:12px 24px;">
+              ${otp}
+            </span>
+          </p>
+          <p style="font-size:14px; color:#555;">This OTP is valid for <strong>10 minutes</strong>. Do not share it with anyone.</p>
+          <p style="text-align:center; color:#999; font-size:12px;">© ${new Date().getFullYear()} DevHub. All Rights Reserved.</p>
+        </div>
+      </body>
+      </html>
+    `;
 
-          <!-- OTP Box -->
-          <tr>
-            <td align="center" style="padding:25px 0;">
-              <div style="font-size:32px; font-weight:bold; color:#4f46e5; border:2px dashed #4f46e5; padding:14px 26px; border-radius:6px;">
-                ${otp}
-              </div>
-            </td>
-          </tr>
+    // Send mail
+    const mailResponse = await sendMail(emailId, "DevHub Password Reset OTP", htmlContent);
 
-          <!-- Footer -->
-          <tr>
-            <td style="font-size:14px; color:#555; line-height:1.6;">
-              <p>This OTP is valid for <strong>10 minutes</strong>. Do not share it with anyone.</p>
-              <p>If you did not request this, you can safely ignore this email.</p>
-              <br/>
-              <p style="text-align:center; color:#999; font-size:12px;">© ${new Date().getFullYear()} DevHub. All Rights Reserved.</p>
-            </td>
-          </tr>
+    // If email sending fails → don’t reveal info, respond safely
+    if (!mailResponse.success) {
+      console.error(`❌ Failed to send password reset OTP to ${emailId}`);
+      return res.status(200).json({
+        ...genericResponse,
+        message: "If this email is registered, you may receive the OTP shortly. Please check again later.",
+      });
+    }
 
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>
-`;
-
-
-    await sendMail(emailId, "Verify Your DevHub Email", htmlContent);
-
-
-
-    return res.status(200).json({ success: true, message: "OTP sent successfully" });
+    // ✅ Always return generic success (even for valid users)
+    return res.status(200).json(genericResponse);
 
   } catch (err) {
-    return res.status(500).json({ success: false, message: "Failed to send OTP", error: err.message });
+    console.error("❌ Forgot Password Error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong while processing your request. Please try again later.",
+    });
   }
 });
-
 authRouter.post("/reset-password", async (req, res) => {
   try {
     const { emailId, otp, newPassword } = req.body;
 
+    if (!emailId || !validator.isEmail(emailId)) {
+      return res.status(400).json({ message: "Please enter a valid email address." });
+    }
+
     const user = await User.findOne({ emailId });
-    if (!user) {
-      return res.status(400).json({
-        message: 'user not found'
-      });
+
+    // Always use generic error to avoid email guessing
+    const genericError = { message: "Invalid or expired OTP. Please try again." };
+
+    if (!user || !user.resetPasswordOTP) {
+      console.log(`⚠️ Password reset attempt for unknown user: ${emailId}`);
+      return res.status(400).json(genericError);
     }
+
+    // Verify OTP
     if (user.resetPasswordOTP !== parseInt(otp)) {
-      return res.status(400).json({
-        message: "invalid OTP"
-      })
+      return res.status(400).json(genericError);
     }
+
+    // Check OTP expiry
     if (Date.now() > user.resetPasswordOTPExpires) {
-      return res.status(400).json({
-        message: "OTP expired"
-      })
+      return res.status(400).json({ message: "Your OTP has expired. Please request a new one." });
     }
+
+    // Check password strength
     if (!validator.isStrongPassword(newPassword)) {
-      return res.status(400).json({
-        message: "enter a strong password!"
-      })
+      return res.status(400).json({ message: "Please enter a strong password." });
     }
+
+    // Update password securely
     const newPasswordHash = await bcrypt.hash(newPassword, 10);
     user.password = newPasswordHash;
     user.resetPasswordOTP = null;
     user.resetPasswordOTPExpires = null;
     await user.save();
-    return res.json({
-      message: "password reset successfully"
-    })
+
+    return res.status(200).json({
+      success: true,
+      message: "Password reset successfully. You can now log in with your new password.",
+    });
+
+  } catch (err) {
+    console.error("❌ Reset Password Error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong while resetting your password. Please try again later.",
+    });
   }
-  catch (err) {
-    res.status(400).json({
-      message: "something went wrong " + err.message,
-    }
-    )
-  }
-})
+});
 
 
 module.exports = authRouter;
