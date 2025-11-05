@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { BASE_URL } from "../../utils/constants";
 import { ArrowLeft } from "lucide-react";
-import { toast } from "react-hot-toast";
+import { toast } from "react-toastify";
 
 const ResetPassword = () => {
   const location = useLocation();
@@ -115,14 +115,25 @@ const ResetPassword = () => {
           {/* Submit Button */}
           <button
             type="submit"
-            disabled={loading}
-            className={`w-full py-2 rounded-md font-medium ${loading
-                ? "bg-gray-600 cursor-not-allowed"
-                : "bg-vibrant-clay hover:bg-orange-600 transition"
+            disabled={
+              loading ||
+              !otp.trim() ||
+              !password.trim() ||
+              !confirmPassword.trim() ||
+              password !== confirmPassword
+            }
+            className={`w-full py-2 rounded-md font-medium ${loading ||
+              !otp.trim() ||
+              !password.trim() ||
+              !confirmPassword.trim() ||
+              password !== confirmPassword
+              ? "bg-gray-600 cursor-not-allowed"
+              : "bg-vibrant-clay hover:bg-orange-600 transition"
               }`}
           >
             {loading ? "Resetting..." : "Reset Password"}
           </button>
+
         </form>
       </div>
     </div>
