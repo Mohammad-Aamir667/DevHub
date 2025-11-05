@@ -1,12 +1,10 @@
-import axios from 'axios';
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { addUser } from '../../utils/userSlice';
-import { useNavigate } from 'react-router-dom';
-import { BASE_URL } from '../../utils/constants';
-import { handleAxiosError } from '../../utils/handleAxiosError';
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { addUser } from "../../utils/userSlice";
+import { useNavigate } from "react-router-dom";
+import { BASE_URL } from "../../utils/constants";
 import { toast } from "react-toastify";
-
 
 const Login = () => {
   const [emailId, setEmailId] = useState("");
@@ -15,125 +13,116 @@ const Login = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoginForm, setIsLoginForm] = useState(true);
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [passwordMatchError, setPasswordMatchError] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((store) => store.user);
-  useEffect(() => {
-    if (user) {
-      navigate('/');
-    }
-  }, [user, navigate]);
-  const handleLogin = async () => {
-    if (!emailId && !password) {
-      setError("Email and password are required");
-      return;
-    } else if (!emailId) {
-      setError("Email is required");
-      return;
-    } else if (!password) {
-      setError("Password is required");
-      return;
-    } else {
-      setError("");
-    }
 
+  useEffect(() => {
+    if (user) navigate("/");
+  }, [user, navigate]);
+
+  // ✅ Handle Login
+  if (loading) return;
+
+  const handleLogin = async () => {
+    if (!emailId || !password) {
+      toast.error("Email and password are required");
+      return;
+    }
 
     setLoading(true);
     try {
-      const res = await axios.post(BASE_URL + "/login", {
-        emailId,
-        password,
-      }, { withCredentials: true });
+      const res = await axios.post(
+        `${BASE_URL}/login`,
+        { emailId: emailId.trim(), password },
+        { withCredentials: true }
+      );
+
       dispatch(addUser(res.data));
+      toast.success("Welcome back!");
       navigate("/");
     } catch (err) {
-      console.log(err);
-      if (err?.response?.status === 401 || err?.response?.status === 400)
-        setError(err?.response?.data);
-      else {
-        handleAxiosError(err, {}, [400, 401], "login-error-toast");
-      }
+      console.log("Login Error:", err);
+      const message =
+        err.response?.data?.message ||
+        err.response?.data ||
+        "Invalid credentials. Please try again.";
+      toast.error(message);
+
     } finally {
       setLoading(false);
     }
   };
+
+  // ✅ Confirm password validation
   useEffect(() => {
-    if (!password.startsWith(confirmPassword)) {
+    if (!isLoginForm && confirmPassword && password !== confirmPassword)
       setPasswordMatchError(true);
-    }
-    else {
-      setPasswordMatchError(false);
-    }
-  }, [password, confirmPassword]);
+    else setPasswordMatchError(false);
+  }, [password, confirmPassword, isLoginForm]);
+  useEffect(() => {
+    setPassword("");
+    setConfirmPassword("");
+    setPasswordMatchError(false);
+  }, [isLoginForm]);
 
-
-
+  // ✅ Handle Signup
   const handleSignUp = async () => {
-    if (!firstName && !lastName && !emailId && !password && !confirmPassword) {
-      setError("All fields are required");
+    if (!firstName || !emailId || !password || !confirmPassword) {
+      toast.error("All fields are required");
       return;
-    } else if (!firstName) {
-      setError("First name is required");
-      return;
-    } else if (!emailId) {
-      setError("Email is required");
-      return;
-    } else if (!password) {
-      setError("Password is required");
-      return;
-    } else if (!confirmPassword) {
-      setError("Confirm password is required");
-      return;
-    } else {
-      setError("");
     }
-
-
     if (password !== confirmPassword) {
+      toast.error("Passwords do not match");
       return;
     }
+
     setLoading(true);
     try {
-      const res = await axios.post(BASE_URL + "/signup", {
-        firstName: firstName.trim(),
-        lastName,
-        emailId: emailId.trim(),
-        password,
-      }, { withCredentials: true });
-      if (res.data.status === "new-user") {
-        toast("Verification code sent!");
-        navigate("/verify-email", { state: { emailId: emailId } });
-      }
+      const res = await axios.post(
+        `${BASE_URL}/signup`,
+        {
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          emailId: emailId.trim(),
+          password,
+        },
+        { withCredentials: true }
+      );
 
-      if (res.data.status === "not-verified") {
-        toast("Account not verified. OTP resent.");
-        navigate("/verify-email", { state: { emailId: emailId } });
-      }
-      if (res.data.status === "verified") {
-        toast("Email already registered. Please login.");
+      const { status, message } = res.data;
+
+      if (status === "new-user") {
+        toast.success("Verification code sent!");
+        navigate("/verify-email", { state: { emailId } });
+      } else if (status === "not-verified") {
+        toast.info("Account not verified. OTP resent.");
+        navigate("/verify-email", { state: { emailId } });
+      } else if (status === "verified") {
+        toast.info("Email already registered. Please login.");
         setIsLoginForm(true);
-
+      } else if (status === "mail-failed") {
+        toast.warning(
+          "Account created, but verification mail may be delayed. Try again later."
+        );
+        navigate("/verify-email", { state: { emailId } });
+      } else {
+        toast(message || "Something went wrong. Please try again.");
       }
-
-
-
     } catch (err) {
-      console.log(err);
-      if (err?.response?.status === 401 || err?.response?.status === 400)
-        setError(err?.response?.data);
-      else {
-        handleAxiosError(err, {}, [400, 401], "signup-error-toast");
-      }
+      console.log("Signup Error:", err);
+      const backendMsg =
+        err.response?.data?.message ||
+        err.response?.data ||
+        "Failed to sign up. Please try again later.";
+      toast.error(backendMsg);
     } finally {
       setLoading(false);
-
     }
   };
-
   return (
     <div className={` ${!isLoginForm ? "mt-9" : "mt-0"} flex justify-center items-center  min-h-screen bg-dark-charcoal p-4 overflow-auto `}>
       <div className="card bg-gray-800 w-full max-w-md shadow-xl rounded-xl">
@@ -144,7 +133,7 @@ const Login = () => {
               <label className="form-control w-full max-w-xs mb-4">
                 <span className="label-text text-soft-white mb-1">First Name</span>
                 <input
-                  type="text"
+                  type="email"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                   placeholder="Enter Your First Name"
@@ -166,7 +155,7 @@ const Login = () => {
           <label className="form-control w-full max-w-xs mb-4">
             <span className="label-text text-soft-white mb-1">Email ID</span>
             <input
-              type="text"
+              type="email"
               value={emailId}
               onChange={(e) => setEmailId(e.target.value)}
               placeholder="Enter your email"
