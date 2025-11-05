@@ -25,7 +25,6 @@ const Login = () => {
   }, [user, navigate]);
 
   // ✅ Handle Login
-  if (loading) return;
 
   const handleLogin = async () => {
     if (!emailId || !password) {
@@ -75,6 +74,11 @@ const Login = () => {
       toast.error("All fields are required");
       return;
     }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(emailId.trim())) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
     if (password !== confirmPassword) {
       toast.error("Passwords do not match");
       return;
@@ -114,11 +118,19 @@ const Login = () => {
       }
     } catch (err) {
       console.log("Signup Error:", err);
+
       const backendMsg =
         err.response?.data?.message ||
         err.response?.data ||
         "Failed to sign up. Please try again later.";
-      toast.error(backendMsg);
+
+      if (err.response?.status === 400) {
+        toast.error(backendMsg);
+      } else if (err.response?.status === 500) {
+        toast.error("Server error. Please try again later.");
+      } else {
+        toast.error(backendMsg);
+      }
     } finally {
       setLoading(false);
     }
@@ -189,7 +201,6 @@ const Login = () => {
           {passwordMatchError && (
             <p className="text-red-500 text-sm mt-1">Passwords do not match</p>
           )}
-          <p className="text-red-500 mb-4">{error}</p>
           <div className="card-actions justify-center mt-6">
             <button
               onClick={isLoginForm ? handleLogin : handleSignUp}
