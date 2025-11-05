@@ -24,10 +24,14 @@ const sendMail = async (to, subject, html) => {
         );
 
         console.log(`✅ Email sent successfully to ${to}`);
-        return true;
-    } catch (error) {
-        console.error(`❌ Email send error to ${to}:`, error.response?.data || error.message);
-        return false;
+        return { success: true };
+    }
+    catch (error) {
+        const errMsg =
+            error.response?.data?.message || error.response?.data || error.message;
+
+        console.error(`❌ Email send error to ${to}:`, errMsg);
+        return { success: false, error: errMsg };
     }
 };
 
