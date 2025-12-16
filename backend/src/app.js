@@ -13,7 +13,7 @@ const { noCache } = require("./middlewares/noCache");
 
 const allowedOrigins = [
   "https://dev-hub-one.vercel.app",
-  "http://localhost:5173"
+  "http://localhost:5173", "http://localhost:5174"
 ];
 
 app.use(cors({
