@@ -96,7 +96,6 @@ const ExpertApplicationForm = () => {
     dispatch(updateExpertStatus({ status: "pending" }))
   }
 
-  // Render application status screens
   if (apiError) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-slate-950 to-slate-900 flex items-center justify-center px-4">
@@ -163,7 +162,7 @@ const ExpertApplicationForm = () => {
   }
 
   return (
-    !expertDetails.expertId && (
+    !expertDetails?.expertId && (
       <div className="min-h-screen bg-gradient-to-b mt-3 from-slate-950 to-slate-900 pt-16 px-6 py-12">
         <div className="max-w-2xl mx-auto bg-slate-800 border border-slate-700 rounded-xl shadow-xl overflow-hidden">
           <div className="h-2 bg-gradient-to-r from-cyan-500 to-blue-600"></div>

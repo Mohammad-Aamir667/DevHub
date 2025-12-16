@@ -2,8 +2,8 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   expertId: null,
-  status: "pending",    
-  expertise: null,      
+  status: "pending",
+  expertise: null,
   experienceYears: null,
   description: null,
   certifications: null,
@@ -13,15 +13,14 @@ const initialState = {
   resumeUrl: null,
   message: null,
   profileUpdated: false,
-  // New fields
   languages: [],
   timezone: null,
   schedule: {
     availableDays: [],
-    timeSlots: [], // Example: [{ day: "Monday", slots: ["10 AM - 12 PM", "2 PM - 4 PM"] }]
+    timeSlots: [],
   },
-  reviews: [], // Example: [{ reviewer: "John Doe", rating: 4, comment: "Great expert!", date: "2025-01-20" }]
-  rating: 0, // Average rating based on reviews
+  reviews: [],
+  rating: 0,
 };
 
 const expertDetailsSlice = createSlice({
@@ -68,7 +67,7 @@ const expertDetailsSlice = createSlice({
       state.rating = rating || 0;
     },
 
-    
+
     updateExpertField(state, action) {
       const { field, value } = action.payload;
       state[field] = value;
@@ -81,7 +80,7 @@ const expertDetailsSlice = createSlice({
       state.rating = (totalRatings / state.reviews.length).toFixed(1);
     },
 
-    
+
     clearExpertData() {
       return initialState;
     },

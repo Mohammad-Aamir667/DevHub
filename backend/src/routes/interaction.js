@@ -15,7 +15,7 @@ interactionRouter.post("/request-help/:expertId", userAuth, async (req, res) => 
       return res.status(400).json({ error: "Missing required fields" });
     }
 
-    if (userId.toString() === expertId) {
+    if (userId.toString() === expertId.toString()) {
       return res.status(400).json({ error: "You cannot send a request to yourself." });
     }
 

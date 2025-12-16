@@ -8,6 +8,7 @@ const { uploadToCloudinary } = require("../utils/cloudinaryConfig");
 const ExpertDetails = require("../models/expertDetails");
 const upload = multer({ dest: 'uploadImage/' });
 
+
 profileRouter.get("/profile",userAuth,async (req,res)=>{
   try{
      const loggedInUser = req.user; 
@@ -26,7 +27,7 @@ profileRouter.post("/editProfile",userAuth,async (req,res)=>{
    Object.keys(req.body).forEach((key)=>{
     loggedInUser[key] = req.body[key];
    });
-   await loggedInUser.save();
+   await loggedInUser.save(); 
    res.json(
    loggedInUser,
    )
@@ -39,7 +40,7 @@ catch (err) {
 profileRouter.post("/uploadImage", userAuth, upload.single('file'), async (req, res) => {
   try {
     const user = req.user;
-    const imageUrl = await uploadToCloudinary(req.file); // Reusing utility
+    const imageUrl = await uploadToCloudinary(req.file); 
     user.photoUrl = imageUrl;
     await user.save();
     res.json({ url: imageUrl });

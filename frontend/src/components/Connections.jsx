@@ -58,7 +58,6 @@ const Connections = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b mt-14 from-slate-950 to-slate-900 pt-5 px-6 py-12">
       <div className="max-w-4xl mx-auto">
-        {/* Header with Back Button */}
         <div className="mb-8 flex items-center justify-between">
           <button
             onClick={() => navigate(-1)}
@@ -73,7 +72,6 @@ const Connections = () => {
           </div>
         </div>
 
-        {/* Empty State */}
         {connections?.length === 0 && (
           <div className="bg-slate-800 border border-slate-700 rounded-xl p-10 text-center">
             <div className="flex justify-center mb-4">
@@ -86,7 +84,6 @@ const Connections = () => {
           </div>
         )}
 
-        {/* Connection Cards */}
         {connections?.data && connections.data.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {connections.data.map((connection) => {
@@ -102,7 +99,6 @@ const Connections = () => {
                   <div className="h-2 bg-gradient-to-r from-cyan-500 to-blue-600"></div>
                   <div className="p-5">
                     <div className="flex items-start gap-4">
-                      {/* Profile Image */}
                       <div className="relative">
                         <div className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 opacity-70 animate-pulse"></div>
                         <img
@@ -112,7 +108,6 @@ const Connections = () => {
                         />
                       </div>
 
-                      {/* User Info */}
                       <div className="flex-1">
                         <h2 className="text-lg font-semibold text-slate-100">
                           {firstName} {lastName}
@@ -134,7 +129,6 @@ const Connections = () => {
     </div>
   )}
 
-  {/* About */}
   <p className="text-xs sm:text-sm text-slate-400 break-words max-w-full">
     {about?.length > 50
       ? about.slice(0, 50) + "..."
@@ -144,7 +138,6 @@ const Connections = () => {
                       </div>
                     </div>
 
-                    {/* View Profile Button */}
                     <div className="mt-4 flex justify-end">
                       <button
                         onClick={() => viewProfile(connection)}

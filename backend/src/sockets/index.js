@@ -5,18 +5,26 @@ const chatSocket = require("./chatSocket");
 const socketManager = async (io) => {
   const socketUserMap = {};
 
-  const pubClient = createClient({
-    url: process.env.REDIS_URL || "redis://localhost:6379",
-  });
+  if (process.env.REDIS_URL) {
+    try {
+      const pubClient = createClient({
+        url: process.env.REDIS_URL,
+      });
 
-  const subClient = pubClient.duplicate();
+      const subClient = pubClient.duplicate();
 
-  await pubClient.connect();
-  await subClient.connect();
+      await pubClient.connect();
+      await subClient.connect();
 
-  io.adapter(createAdapter(pubClient, subClient));
-
-  console.log("Redis adapter connected for Socket.IO");
+      io.adapter(createAdapter(pubClient, subClient));
+      console.log("Redis adapter enabled for Socket.IO");
+    } catch (err) {
+      console.error("Redis connection failed, falling back to single-instance mode");
+      console.error(err.message);
+    }
+  } else {
+    console.log("Redis adapter not enabled (single-instance mode)");
+  }
 
   io.on("connection", (socket) => {
     chatSocket(io, socket, socketUserMap);
