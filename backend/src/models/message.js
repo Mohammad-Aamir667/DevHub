@@ -1,17 +1,17 @@
 const mongoose = require("mongoose");
 const messageSchema = new mongoose.Schema({
-    fromUserId:{
-            type:mongoose.Schema.Types.ObjectId,
-            required:true,
-            ref:'User',
-    },
+  fromUserId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: 'User',
+  },
   conversation: { type: mongoose.Schema.Types.ObjectId, ref: 'Conversation' },
   messageText: {
     type: String,
   },
   file: {
     type: String,
-   
+
   },
   fileName: {
     type: String,
@@ -23,7 +23,7 @@ const messageSchema = new mongoose.Schema({
     // default: 'text',
   },
   fileUrl: {
-    type: String, 
+    type: String,
     default: '',
   },
   seenBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
@@ -32,5 +32,7 @@ const messageSchema = new mongoose.Schema({
     default: Date.now,
   },
 });
+messageSchema.index({ conversation: 1, timestamp: -1 });
 
-module.exports = mongoose.model("Message",messageSchema);
+
+module.exports = mongoose.model("Message", messageSchema);
