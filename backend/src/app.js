@@ -31,7 +31,7 @@ const io = socketIo(server, {
     credentials: true,
   },
 });
-// io.use(socketAuth);
+io.use(socketAuth);
 socketManager(io);
 app.use(express.json());
 app.use(cors({
