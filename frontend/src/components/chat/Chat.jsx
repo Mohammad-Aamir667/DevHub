@@ -11,10 +11,9 @@ import { ArrowLeft, Paperclip, Send, User, Loader2 } from "lucide-react"
 import { updateConversations } from "../../utils/conversationsSlice"
 
 const socket = io(BASE_URL, {
-  auth: {
-    token: localStorage.getItem("token"), // or get from cookies
-  }
-})
+  withCredentials: true,
+});
+
 
 const Chat = () => {
   const [file, setFile] = useState(null)
@@ -45,6 +44,7 @@ const Chat = () => {
     return () => {
       socket.emit("leaveRoom", roomId)
       socket.off("receiveMessage")
+      // socket.disconnect()
     }
   }, [groupChat, toUserId, groupId, fromUserId]);
 
@@ -75,6 +75,8 @@ const Chat = () => {
 
     return () => {
       socket.off("receiveMessage")
+      // socket.disconnect()
+
     }
   }, [groupChat, groupId, dispatch])
 
