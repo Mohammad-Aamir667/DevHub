@@ -53,17 +53,19 @@ const adminRouter = require("./routes/admin");
 const interactionRouter = require("./routes/interaction");
 const authRoutes = require("./modules/auth/auth.route");
 const userRoutes = require("./modules/user/user.route");
+const requestRoutes = require("./modules/request/request.route");
 const PORT = process.env.PORT || 10000
 
 app.use("/", authRouter);
 app.use("/", profileRouter);
-app.use("/", requestRouter);
 app.use("/", userRoutes);
 app.use("/", messageRouter);
 app.use("/", fileRouter);
 app.use("/", expertRouter);
 app.use("/", adminRouter);
 app.use("/", interactionRouter);
+app.use("/", requestRoutes);
+
 connectDB().then(() => {
 
   server.listen(PORT, "0.0.0.0", () => {
