@@ -9,7 +9,6 @@ const User = require("../models/user");
 const sendMail = require("../utils/sendMail");
 authRouter.post("/signup", async (req, res) => {
   try {
-    // ✅ 1. Validate input
     const validation = validateSignUpData(req);
     if (!validation.isValid) {
       return res.status(400).json({ message: validation.message });
@@ -18,10 +17,8 @@ authRouter.post("/signup", async (req, res) => {
     let { firstName, lastName, emailId, password } = req.body;
     emailId = emailId.toLowerCase();
 
-    // ✅ 2. Check if user already exists
     const existingUser = await User.findOne({ emailId });
 
-    // ✅ 3. Generate OTP + HTML Template
     const generateOtpAndTemplate = () => {
       const otp = crypto.randomInt(100000, 999999);
       const htmlContent = `
@@ -45,7 +42,6 @@ authRouter.post("/signup", async (req, res) => {
       return { otp, htmlContent };
     };
 
-    // ✅ 4. Handle verified existing user
     if (existingUser && existingUser.isVerified) {
       return res.status(409).json({
         status: "verified",
@@ -53,7 +49,6 @@ authRouter.post("/signup", async (req, res) => {
       });
     }
 
-    // ✅ 5. Handle existing but unverified user (resend OTP)
     if (existingUser && !existingUser.isVerified) {
       const { otp, htmlContent } = generateOtpAndTemplate();
       existingUser.signupOTP = otp;
@@ -63,7 +58,6 @@ authRouter.post("/signup", async (req, res) => {
       const mailResponse = await sendMail(emailId, "Verify Your DevHub Email", htmlContent);
 
       if (!mailResponse.success) {
-        // ⚠️ Don’t break UX — still respond gracefully
         return res.status(200).json({
           status: "mail-failed",
           message: "Verification mail may be delayed. Please try resending the OTP later.",
@@ -76,7 +70,6 @@ authRouter.post("/signup", async (req, res) => {
       });
     }
 
-    // ✅ 6. Handle new user registration
     const passwordHash = await bcrypt.hash(password, 10);
     const newUser = new User({
       firstName,
@@ -94,14 +87,12 @@ authRouter.post("/signup", async (req, res) => {
     const mailResponse = await sendMail(emailId, "Verify Your DevHub Email", htmlContent);
 
     if (!mailResponse.success) {
-      // ⚠️ Keep the account created — let the user resend OTP later
       return res.status(201).json({
         status: "mail-failed",
         message: "Account created, but verification mail may be delayed. Please try again later.",
       });
     }
 
-    // ✅ 7. Success — mail sent
     return res.status(201).json({
       status: "new-user",
       message: "Account created. Verification OTP sent successfully.",
