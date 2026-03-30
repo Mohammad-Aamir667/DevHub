@@ -62,10 +62,10 @@ app.use("/", userRoutes);
 app.use("/", messageRouter);
 app.use("/", fileRouter);
 app.use("/", expertRouter);
-app.use("/", adminRouter);
+// app.use("/", adminRouter);
 app.use("/", interactionRouter);
 app.use("/", requestRoutes);
-app.use("/", superAdminRouter);
+app.use("/superadmin", superAdminRouter);
 connectDB().then(() => {
 
   server.listen(PORT, "0.0.0.0", () => {
