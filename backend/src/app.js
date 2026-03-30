@@ -55,7 +55,7 @@ const authRoutes = require("./modules/auth/auth.route");
 const userRoutes = require("./modules/user/user.route");
 const requestRoutes = require("./modules/request/request.route");
 const PORT = process.env.PORT || 10000
-
+const superAdminRouter = require("./modules/superadmin/superadmin.route");
 app.use("/", authRouter);
 app.use("/", profileRouter);
 app.use("/", userRoutes);
@@ -65,7 +65,7 @@ app.use("/", expertRouter);
 app.use("/", adminRouter);
 app.use("/", interactionRouter);
 app.use("/", requestRoutes);
-
+app.use("/", superAdminRouter);
 connectDB().then(() => {
 
   server.listen(PORT, "0.0.0.0", () => {
