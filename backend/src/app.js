@@ -51,13 +51,13 @@ const fileRouter = require("./routes/files");
 const expertRouter = require("./routes/expert");
 const adminRouter = require("./routes/admin");
 const interactionRouter = require("./routes/interaction");
-// const authRoutes = require("./modules/auth/auth.route");
+const authRoutes = require("./modules/auth/auth.route");
 const userRoutes = require("./modules/user/user.route");
 const requestRoutes = require("./modules/request/request.route");
 const PORT = process.env.PORT || 10000
 const superAdminRouter = require("./modules/superAdmin/superadmin.route");
 const messageRoutes = require("./modules/message/message.route");
-app.use("/", authRouter);
+// app.use("/", authRouter);
 app.use("/", profileRouter);
 
 app.use("/", userRoutes);
@@ -69,6 +69,7 @@ app.use("/", interactionRouter);
 app.use("/", requestRoutes);
 app.use("/", superAdminRouter);
 app.use("/", messageRoutes)
+app.use("/", authRoutes);
 connectDB().then(() => {
 
   server.listen(PORT, "0.0.0.0", () => {
