@@ -63,13 +63,12 @@ const expertRoutes = require("./modules/expert/expert.route");
 const filesRoutes = require("./modules/files/files.route");
 // app.use("/", authRouter);
 // app.use("/", profileRouter);
-
-app.use("/", userRoutes);
 // app.use("/", messageRouter);
 // app.use("/", fileRouter);
 // app.use("/", expertRouter);
 // app.use("/", adminRouter);
 // app.use("/", interactionRouter);
+app.use("/", userRoutes);
 app.use("/", requestRoutes);
 app.use("/", superAdminRouter);
 app.use("/", messageRoutes)
