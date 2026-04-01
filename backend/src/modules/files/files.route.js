@@ -6,7 +6,7 @@ const upload = multer({ dest: "uploads/" });
 
 const { userAuth } = require("../../middlewares/auth");
 
-const { sendFile } = require("./file.controller");
+const { sendFile } = require("./files.controller");
 
 fileRouter.post(
     "/file-send/:chatId",

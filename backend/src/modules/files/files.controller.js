@@ -1,4 +1,4 @@
-const { sendFileService } = require("./file.service");
+const { sendFileService } = require("./files.service");
 
 const sendFile = async (req, res) => {
     try {
