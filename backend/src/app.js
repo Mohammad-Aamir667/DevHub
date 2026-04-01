@@ -57,8 +57,9 @@ const requestRoutes = require("./modules/request/request.route");
 const PORT = process.env.PORT || 10000
 const superAdminRouter = require("./modules/superAdmin/superadmin.route");
 const messageRoutes = require("./modules/message/message.route");
+const profileRoutes = require("./modules/profile/profile.route");
 // app.use("/", authRouter);
-app.use("/", profileRouter);
+// app.use("/", profileRouter);
 
 app.use("/", userRoutes);
 // app.use("/", messageRouter);
@@ -70,6 +71,7 @@ app.use("/", requestRoutes);
 app.use("/", superAdminRouter);
 app.use("/", messageRoutes)
 app.use("/", authRoutes);
+app.use("/", profileRoutes);
 connectDB().then(() => {
 
   server.listen(PORT, "0.0.0.0", () => {
