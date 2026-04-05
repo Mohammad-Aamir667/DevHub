@@ -5,6 +5,8 @@ const { signupEmailTemplate, forgetPasswordEmailTemplate } = require("../../util
 const { generateOtp } = require("../../utils/generateOtp");
 const sendMail = require("../../utils/sendMail");
 const { validateSignUpData } = require("../../validation/auth.validation");
+const validator = require("validator");
+
 
 exports.signup = async (data) => {
 
